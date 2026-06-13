@@ -1,0 +1,9 @@
+{
+  "id": "shieldup",
+  "name": "Shield",
+  "type": "shield",
+  "durationMs": 6000,
+  "tint": "#6aff8a",
+  "dropChance": 0.08,
+  "sprite": "powerupGreen_shield"
+}

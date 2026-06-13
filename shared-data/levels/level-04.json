@@ -1,0 +1,9 @@
+{
+  "id": "level-04",
+  "name": "Carpet-Bombing",
+  "waves": [
+    { "rosterIndex": 4, "rows": 1, "cols": 2, "spacingX": 240, "spacingY": 60, "startY": 180, "entryStaggerMs": 250 },
+    { "rosterIndex": 0, "rows": 2, "cols": 7, "spacingX": 72, "spacingY": 60, "startY": 210, "entryStaggerMs": 80, "diveIntervalMs": 1000 },
+    { "rosterIndex": 5, "rows": 1, "cols": 2, "spacingX": 240, "spacingY": 60, "startY": 180, "entryStaggerMs": 250 }
+  ]
+}

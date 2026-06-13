@@ -1,0 +1,15 @@
+{
+  "id": "razer",
+  "name": "Razer",
+  "hp": 4,
+  "behavior": "razer",
+  "size": 48,
+  "scoreValue": 180,
+  "coinValue": 4,
+  "tint": "#ff3a6a",
+  "speed": 70,
+  "sprite": "enemyRed5",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 0
+}

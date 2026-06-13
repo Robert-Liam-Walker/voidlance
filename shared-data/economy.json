@@ -1,13 +1,7 @@
 {
   "upgrades": [
-    {
-      "id": "plasma",
-      "name": "Plasma Tuning",
-      "stat": "bulletDamage",
-      "perLevel": 1,
-      "baseCost": 50,
-      "costGrowth": 1.8,
-      "maxLevel": 5
-    }
+    { "id": "plasma", "name": "Plasma Tuning", "stat": "bulletDamage", "perLevel": 1, "baseCost": 50, "costGrowth": 1.8, "maxLevel": 5 },
+    { "id": "armor", "name": "Armor Plating", "stat": "maxHp", "perLevel": 1, "baseCost": 90, "costGrowth": 2.1, "maxLevel": 3 },
+    { "id": "cooling", "name": "Cooling System", "stat": "fireRateMs", "perLevel": -22, "baseCost": 70, "costGrowth": 1.8, "maxLevel": 4 }
   ]
 }

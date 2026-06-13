@@ -1,8 +1,8 @@
 {
-  "id": "nova-drone",
-  "name": "Raider",
+  "id": "fighter",
+  "name": "Fighter",
   "hp": 2,
-  "shape": "drone",
+  "behavior": "fighter",
   "size": 44,
   "scoreValue": 100,
   "coinValue": 2,
@@ -10,6 +10,6 @@
   "speed": 90,
   "sprite": "enemyRed1",
   "bulletSprite": "laserRed01",
-  "fireChance": 0.14,
-  "bulletSpeed": 260
+  "fireChance": 0.5,
+  "bulletSpeed": 285
 }

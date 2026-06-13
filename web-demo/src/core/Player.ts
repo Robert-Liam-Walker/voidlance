@@ -5,18 +5,23 @@ import type { Bullets } from './Bullets';
 import { glow } from './ui';
 import { hexToNum } from '../util/color';
 
-// Pointer-drag movement (thumb) + auto-fire. Uses the theme's Kenney ship sprite.
+// Pointer-drag movement + auto-fire, with the Alien-Sky weapon modifiers:
+// multishot (extra gun lanes), spread, rapid fire, and shield.
 export class Player extends Phaser.Physics.Arcade.Sprite {
   hp: number;
   maxHp: number;
+  lanes = 1;
   private stats: PlayerStats;
   private bullets: Bullets;
   private fireCd = 0;
   private rapidUntil = 0;
+  private spreadUntil = 0;
+  private shieldUntil = 0;
   private invulnUntil = 0;
   private minY: number;
   private maxY: number;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private shieldFx?: Phaser.GameObjects.Image;
 
   constructor(scene: Phaser.Scene, theme: ThemeDef, stats: PlayerStats, bullets: Bullets) {
     const W = scene.scale.width;
@@ -63,46 +68,77 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const k = 10;
     const maxS = 1000;
-    this.setVelocity(
-      Phaser.Math.Clamp((tx - this.x) * k, -maxS, maxS),
-      Phaser.Math.Clamp((ty - this.y) * k, -maxS, maxS)
-    );
+    this.setVelocity(Phaser.Math.Clamp((tx - this.x) * k, -maxS, maxS), Phaser.Math.Clamp((ty - this.y) * k, -maxS, maxS));
 
     this.fireCd -= delta;
     if (this.fireCd <= 0) {
       this.fire(time);
-      this.fireCd = this.currentFireRate(time);
+      this.fireCd = time < this.rapidUntil ? this.stats.fireRateMs * 0.45 : this.stats.fireRateMs;
     }
 
-    this.setAlpha(time < this.invulnUntil ? (Math.floor(time / 80) % 2 === 0 ? 0.3 : 1) : 1);
-  }
-
-  private currentFireRate(time: number): number {
-    return time < this.rapidUntil ? this.stats.fireRateMs * 0.45 : this.stats.fireRateMs;
+    this.updateShieldFx(time);
+    if (!this.isShielded(time)) {
+      this.setAlpha(time < this.invulnUntil ? (Math.floor(time / 80) % 2 === 0 ? 0.3 : 1) : 1);
+    } else {
+      this.setAlpha(1);
+    }
   }
 
   private fire(time: number): void {
     const vy = -this.stats.bulletSpeed;
-    this.bullets.fire(this.x, this.y - 30, 0, vy, 0xffffff, 0.85);
-    if (time < this.rapidUntil) {
-      this.bullets.fire(this.x - 18, this.y - 14, -70, vy, 0xffffff, 0.7);
-      this.bullets.fire(this.x + 18, this.y - 14, 70, vy, 0xffffff, 0.7);
+    const spacing = 14;
+    const x0 = -((this.lanes - 1) * spacing) / 2;
+    for (let i = 0; i < this.lanes; i++) {
+      this.bullets.fire(this.x + x0 + i * spacing, this.y - 30, 0, vy, 0xffffff, 0.85);
+    }
+    if (time < this.spreadUntil) {
+      this.bullets.fire(this.x, this.y - 20, -160, vy, 0xffffff, 0.7);
+      this.bullets.fire(this.x, this.y - 20, 160, vy, 0xffffff, 0.7);
+    }
+  }
+
+  private updateShieldFx(time: number): void {
+    const on = time < this.shieldUntil;
+    if (on && !this.shieldFx) {
+      this.shieldFx = this.scene.add
+        .image(this.x, this.y, 'glow')
+        .setTint(0x6affc0)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(9)
+        .setScale(0.95);
+    }
+    if (this.shieldFx) {
+      if (on) this.shieldFx.setPosition(this.x, this.y).setAlpha(0.35 + 0.18 * Math.sin(time * 0.02));
+      else {
+        this.shieldFx.destroy();
+        this.shieldFx = undefined;
+      }
     }
   }
 
   get damage(): number {
     return this.stats.bulletDamage;
   }
-
+  addLane(): void {
+    this.lanes = Math.min(4, this.lanes + 1);
+  }
   applyRapid(durationMs: number, time: number): void {
     this.rapidUntil = time + durationMs;
   }
-
+  applySpread(durationMs: number, time: number): void {
+    this.spreadUntil = time + durationMs;
+  }
+  applyShield(durationMs: number, time: number): void {
+    this.shieldUntil = time + durationMs;
+  }
+  isShielded(time: number): boolean {
+    return time < this.shieldUntil;
+  }
   isInvuln(time: number): boolean {
-    return time < this.invulnUntil;
+    return time < this.invulnUntil || time < this.shieldUntil;
   }
 
-  /** @returns true if this hit was fatal. */
+  /** @returns true if this hit was fatal. Shield/invuln absorb with no damage. */
   takeHit(time: number): boolean {
     if (this.isInvuln(time)) return false;
     this.hp -= 1;

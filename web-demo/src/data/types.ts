@@ -5,7 +5,7 @@ export interface EnemyDef {
   id: string;
   name: string;
   hp: number;
-  shape: 'drone' | 'wing' | 'bug' | 'diamond';
+  behavior: 'fighter' | 'smasher' | 'builder' | 'transport' | 'demolisher' | 'razer' | 'emitter' | 'phantom' | 'interceptor';
   size: number;
   scoreValue: number;
   coinValue: number;
@@ -37,7 +37,7 @@ export interface LevelDef {
 export interface PowerUpDef {
   id: string;
   name: string;
-  type: 'rapidFire' | 'spread' | 'shield';
+  type: 'rapidFire' | 'spread' | 'shield' | 'multishot' | 'homing' | 'laser' | 'nuke' | 'botLauncher';
   durationMs: number;
   tint: string;
   dropChance: number;

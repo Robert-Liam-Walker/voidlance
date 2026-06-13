@@ -1,0 +1,15 @@
+{
+  "id": "transport",
+  "name": "Transport",
+  "hp": 4,
+  "behavior": "transport",
+  "size": 52,
+  "scoreValue": 200,
+  "coinValue": 6,
+  "tint": "#6aff6a",
+  "speed": 95,
+  "sprite": "enemyGreen4",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0.5,
+  "bulletSpeed": 250
+}

@@ -1,8 +1,8 @@
 {
   "id": "level-01",
-  "name": "Sector 1",
+  "name": "They're Approaching",
   "waves": [
     { "rosterIndex": 0, "rows": 2, "cols": 6, "spacingX": 78, "spacingY": 66, "startY": 230, "entryStaggerMs": 90, "diveIntervalMs": 1500 },
-    { "rosterIndex": 0, "rows": 3, "cols": 7, "spacingX": 72, "spacingY": 62, "startY": 200, "entryStaggerMs": 80, "diveIntervalMs": 1200 }
+    { "rosterIndex": 0, "rows": 2, "cols": 7, "spacingX": 72, "spacingY": 62, "startY": 200, "entryStaggerMs": 80, "diveIntervalMs": 1200 }
   ]
 }

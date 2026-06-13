@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { EnemyDef } from '../data/types';
 
-export type EnemyMode = 'enter' | 'formation' | 'dive' | 'return';
+export type EnemyMode = 'enter' | 'formation' | 'dive' | 'return' | 'active';
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   def: EnemyDef;
@@ -12,6 +12,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   row = 0;
   col = 0;
   fireCd = 0;
+  actCd = 0;
+  dir = 1;
+  phase = 0;
+  didAct = false;
   diveTween?: Phaser.Tweens.Tween;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: EnemyDef, texKey: string, hp: number) {
@@ -25,5 +29,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setSize(this.width * 0.7, this.height * 0.7, true);
     this.fireCd = Phaser.Math.Between(900, 2800);
+    this.actCd = Phaser.Math.Between(1400, 2800);
   }
 }

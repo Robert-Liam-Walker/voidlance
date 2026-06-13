@@ -21,7 +21,7 @@
     "bulletSprite": "laserGreen01"
   },
   "background": { "style": "starfield", "starTint": "#a6ff3a" },
-  "enemyRosterIds": ["void-bug"],
-  "powerupIds": ["overdrive"],
-  "levelIds": ["level-01", "level-02", "level-03"]
+  "enemyRosterIds": ["fighter", "smasher", "builder", "transport", "demolisher", "razer", "emitter", "phantom", "interceptor"],
+  "powerupIds": ["overdrive", "weaponup", "spreadshot", "shieldup", "homing", "laser", "nuke", "botlauncher"],
+  "levelIds": ["level-01", "level-02", "level-03", "level-04", "level-05"]
 }

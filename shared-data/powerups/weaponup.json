@@ -1,0 +1,9 @@
+{
+  "id": "weaponup",
+  "name": "Weapon Up",
+  "type": "multishot",
+  "durationMs": 0,
+  "tint": "#6aff6a",
+  "dropChance": 0.1,
+  "sprite": "powerupGreen_bolt"
+}

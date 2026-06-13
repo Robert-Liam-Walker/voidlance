@@ -1,8 +1,9 @@
 {
   "id": "level-02",
-  "name": "Sector 2",
+  "name": "Kamikaze Run",
   "waves": [
-    { "rosterIndex": 0, "rows": 3, "cols": 8, "spacingX": 70, "spacingY": 60, "startY": 200, "entryStaggerMs": 70, "diveIntervalMs": 1100 },
-    { "rosterIndex": 0, "rows": 4, "cols": 8, "spacingX": 70, "spacingY": 58, "startY": 180, "entryStaggerMs": 60, "diveIntervalMs": 950 }
+    { "rosterIndex": 0, "rows": 2, "cols": 7, "spacingX": 72, "spacingY": 62, "startY": 200, "entryStaggerMs": 80, "diveIntervalMs": 1200 },
+    { "rosterIndex": 1, "rows": 1, "cols": 6, "spacingX": 92, "spacingY": 60, "startY": 180, "entryStaggerMs": 120, "diveIntervalMs": 1000 },
+    { "rosterIndex": 0, "rows": 3, "cols": 7, "spacingX": 70, "spacingY": 60, "startY": 190, "entryStaggerMs": 70, "diveIntervalMs": 1000 }
   ]
 }

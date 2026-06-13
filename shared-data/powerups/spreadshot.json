@@ -1,0 +1,9 @@
+{
+  "id": "spreadshot",
+  "name": "Spread",
+  "type": "spread",
+  "durationMs": 8000,
+  "tint": "#36e0ff",
+  "dropChance": 0.08,
+  "sprite": "powerupBlue_star"
+}

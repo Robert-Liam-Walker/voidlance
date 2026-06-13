@@ -1,0 +1,10 @@
+{
+  "id": "level-05",
+  "name": "Special Forces",
+  "waves": [
+    { "rosterIndex": 6, "rows": 1, "cols": 2, "spacingX": 260, "spacingY": 60, "startY": 170, "entryStaggerMs": 300 },
+    { "rosterIndex": 7, "rows": 1, "cols": 2, "spacingX": 200, "spacingY": 60, "startY": 200, "entryStaggerMs": 250 },
+    { "rosterIndex": 8, "rows": 1, "cols": 3, "spacingX": 150, "spacingY": 60, "startY": 160, "entryStaggerMs": 150, "diveIntervalMs": 900 },
+    { "rosterIndex": 0, "rows": 2, "cols": 6, "spacingX": 74, "spacingY": 62, "startY": 210, "entryStaggerMs": 90, "diveIntervalMs": 950 }
+  ]
+}

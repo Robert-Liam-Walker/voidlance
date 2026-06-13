@@ -1,0 +1,15 @@
+{
+  "id": "demolisher",
+  "name": "Demolisher",
+  "hp": 4,
+  "behavior": "demolisher",
+  "size": 50,
+  "scoreValue": 180,
+  "coinValue": 4,
+  "tint": "#ff5a2a",
+  "speed": 70,
+  "sprite": "enemyBlack5",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 0
+}

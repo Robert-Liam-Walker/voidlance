@@ -1,0 +1,15 @@
+{
+  "id": "smasher",
+  "name": "Smasher",
+  "hp": 1,
+  "behavior": "smasher",
+  "size": 42,
+  "scoreValue": 120,
+  "coinValue": 2,
+  "tint": "#ff8a4a",
+  "speed": 230,
+  "sprite": "enemyRed3",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 0
+}
