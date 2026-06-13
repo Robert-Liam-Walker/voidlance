@@ -1,0 +1,25 @@
+{
+  "id": "void-hornet",
+  "name": "Void Hornet",
+  "tagline": "Sting the hive before it swarms.",
+  "palette": {
+    "bg": "#0c0a04",
+    "bgAccent": "#2a1e05",
+    "accent": "#a6ff3a",
+    "text": "#f3ffe2",
+    "danger": "#ff8a1e"
+  },
+  "player": {
+    "tint": "#ffd23f",
+    "bulletTint": "#a6ff3a",
+    "shape": "wasp",
+    "fireRateMs": 240,
+    "bulletSpeed": 600,
+    "bulletDamage": 1,
+    "maxHp": 3
+  },
+  "background": { "style": "starfield", "starTint": "#a6ff3a" },
+  "enemyRosterIds": ["void-bug"],
+  "powerupIds": ["overdrive"],
+  "levelIds": ["level-01", "level-02", "level-03"]
+}

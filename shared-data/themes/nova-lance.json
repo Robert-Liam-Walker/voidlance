@@ -1,0 +1,25 @@
+{
+  "id": "nova-lance",
+  "name": "Nova Lance",
+  "tagline": "Pierce the neon swarm.",
+  "palette": {
+    "bg": "#0a0420",
+    "bgAccent": "#1b0b4d",
+    "accent": "#ff3df0",
+    "text": "#e9e2ff",
+    "danger": "#ff5c6e"
+  },
+  "player": {
+    "tint": "#36e0ff",
+    "bulletTint": "#ff3df0",
+    "shape": "arrow",
+    "fireRateMs": 220,
+    "bulletSpeed": 620,
+    "bulletDamage": 1,
+    "maxHp": 3
+  },
+  "background": { "style": "grid", "starTint": "#ff3df0" },
+  "enemyRosterIds": ["nova-drone"],
+  "powerupIds": ["overdrive"],
+  "levelIds": ["level-01", "level-02", "level-03"]
+}

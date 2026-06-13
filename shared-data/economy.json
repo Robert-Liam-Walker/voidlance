@@ -1,0 +1,13 @@
+{
+  "upgrades": [
+    {
+      "id": "plasma",
+      "name": "Plasma Tuning",
+      "stat": "bulletDamage",
+      "perLevel": 1,
+      "baseCost": 50,
+      "costGrowth": 1.8,
+      "maxLevel": 5
+    }
+  ]
+}

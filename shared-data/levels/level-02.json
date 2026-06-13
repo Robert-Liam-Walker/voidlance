@@ -1,0 +1,8 @@
+{
+  "id": "level-02",
+  "name": "Sector 2",
+  "waves": [
+    { "rosterIndex": 0, "rows": 3, "cols": 8, "spacingX": 70, "spacingY": 60, "startY": 200, "entryStaggerMs": 70, "diveIntervalMs": 1100 },
+    { "rosterIndex": 0, "rows": 4, "cols": 8, "spacingX": 70, "spacingY": 58, "startY": 180, "entryStaggerMs": 60, "diveIntervalMs": 950 }
+  ]
+}

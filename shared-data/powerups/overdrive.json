@@ -1,0 +1,8 @@
+{
+  "id": "overdrive",
+  "name": "Overdrive",
+  "type": "rapidFire",
+  "durationMs": 6000,
+  "tint": "#ffd23f",
+  "dropChance": 0.12
+}

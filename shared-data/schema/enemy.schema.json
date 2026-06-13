@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "enemy.schema.json",
+  "title": "Enemy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "hp", "shape", "size", "scoreValue", "coinValue", "tint", "speed"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "hp": { "type": "integer", "minimum": 1 },
+    "shape": { "enum": ["drone", "wing", "bug", "diamond"] },
+    "size": { "type": "number", "minimum": 8 },
+    "scoreValue": { "type": "integer", "minimum": 0 },
+    "coinValue": { "type": "integer", "minimum": 0 },
+    "tint": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "speed": { "type": "number", "minimum": 0 },
+    "fireChance": { "type": "number", "minimum": 0, "maximum": 1 },
+    "bulletSpeed": { "type": "number", "minimum": 0 }
+  }
+}
