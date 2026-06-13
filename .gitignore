@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+
+# build output: a generated mirror of canonical shared-data/ (never hand-edit)
+web-demo/src/shared-data.generated/
+
+# verification artifacts
+web-demo/shots/
+.verify/

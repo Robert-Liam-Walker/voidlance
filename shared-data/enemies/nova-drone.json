@@ -1,0 +1,13 @@
+{
+  "id": "nova-drone",
+  "name": "Neon Drone",
+  "hp": 2,
+  "shape": "drone",
+  "size": 36,
+  "scoreValue": 100,
+  "coinValue": 2,
+  "tint": "#36e0ff",
+  "speed": 90,
+  "fireChance": 0.14,
+  "bulletSpeed": 260
+}

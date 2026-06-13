@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "powerup.schema.json",
+  "title": "PowerUp",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "type", "durationMs", "tint", "dropChance"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["rapidFire", "spread", "shield"] },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "tint": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "dropChance": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

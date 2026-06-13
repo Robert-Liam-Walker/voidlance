@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "wave.schema.json",
+  "title": "Wave",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rosterIndex", "rows", "cols", "spacingX", "spacingY", "startY", "entryStaggerMs"],
+  "properties": {
+    "rosterIndex": { "type": "integer", "minimum": 0, "description": "index into the active theme's enemyRosterIds" },
+    "rows": { "type": "integer", "minimum": 1, "maximum": 8 },
+    "cols": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "spacingX": { "type": "number", "minimum": 8 },
+    "spacingY": { "type": "number", "minimum": 8 },
+    "startY": { "type": "number", "minimum": 0 },
+    "entryStaggerMs": { "type": "number", "minimum": 0 },
+    "diveIntervalMs": { "type": "number", "minimum": 200 }
+  }
+}
