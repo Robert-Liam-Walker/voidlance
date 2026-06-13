@@ -1,4 +1,4 @@
-import type { ThemeDef, LevelDef, EnemyDef } from '../data/types';
+import type { ThemeDef, LevelDef, EnemyDef, BossDef, BossPartDef } from '../data/types';
 import type { GameData } from '../data/loader';
 import type { Economy, PlayerStats } from '../systems/Economy';
 import type { Entity, Kind, FxEvent } from './types';
@@ -54,6 +54,18 @@ export class World implements EnemyHost {
   private fx: FxEvent[] = [];
   private enemyBulletColor: number;
 
+  // boss state
+  private currentLevel: LevelDef | null = null;
+  private bossDef: BossDef | null = null;
+  private bossCore: Entity | null = null;
+  private bossParts: { e: Entity; def: BossPartDef; cd: number }[] = [];
+  private bossArrived = false;
+  private bossPhase = 0;
+  private bossFireCd = 0;
+  private bossRadialCd = 0;
+  private bossSway = 0;
+  private bossDone = false;
+
   constructor(
     private theme: ThemeDef,
     stats: PlayerStats,
@@ -91,6 +103,7 @@ export class World implements EnemyHost {
     this.player.move(dtMs, this.tx, this.ty);
     this.player.tickFire(dtMs, this.time, (x, y, bvx, bvy) => this.spawnPlayerBullet(x, y, bvx, bvy));
     this.enemyMgr.update(dtMs);
+    this.updateBoss(dtMs);
     this.moveProjectiles(dtMs);
     this.updateBots(dtMs);
     this.updateHoming(dtMs);
@@ -214,6 +227,28 @@ export class World implements EnemyHost {
           break;
         }
       }
+      if (!b.alive) continue;
+      let consumed = false;
+      for (const part of this.bossParts) {
+        if (part.e.alive && this.hit(b, part.e)) {
+          b.alive = false;
+          consumed = true;
+          part.e.hp -= this.player.damage;
+          if (part.e.hp <= 0) {
+            this.fx.push({ type: 'burst', x: part.e.x, y: part.e.y, color: part.e.color, count: 16 });
+            this.score += 200;
+            part.e.alive = false;
+          }
+          break;
+        }
+      }
+      if (consumed) continue;
+      if (this.bossCore && this.bossArrived && this.hit(b, this.bossCore)) {
+        b.alive = false;
+        this.bossCore.hp -= this.player.damage;
+        this.fx.push({ type: 'burst', x: b.x, y: b.y, color: this.bossCore.color, count: 3 });
+        if (this.bossCore.hp <= 0) this.bossDefeated();
+      }
     }
     this.bullets = this.bullets.filter((b) => b.alive);
     this.barriers = this.barriers.filter((w) => w.alive);
@@ -257,6 +292,11 @@ export class World implements EnemyHost {
           break;
         }
       }
+    }
+    if (!this.player.isInvuln(this.time) && this.bossCore && this.bossArrived) {
+      let touched = this.hit(this.playerE, this.bossCore);
+      if (!touched) for (const p of this.bossParts) if (p.e.alive && this.hit(this.playerE, p.e)) { touched = true; break; }
+      if (touched) this.damagePlayer();
     }
 
     // powerup pickup
@@ -545,18 +585,198 @@ export class World implements EnemyHost {
   private startLevelAt(idx: number): void {
     this.levelIdx = idx;
     const level = this.data.level(this.levelIds[idx]) as LevelDef;
+    this.currentLevel = level;
+    this.bossDone = false;
+    this.clearBoss();
     this.levelName = this.loop > 0 ? `${level.name}  +${this.loop}` : level.name;
     this.enemyMgr.startLevel(level, this.loop);
   }
 
+  /** Called by EnemyManager when all waves are cleared. */
   onLevelCleared(): void {
     if (this.over) return;
+    const lvl = this.currentLevel;
+    if (lvl?.bossId && !this.bossDone && !this.bossCore) {
+      this.spawnBoss(lvl.bossId);
+      return;
+    }
+    this.advanceLevel();
+  }
+
+  private advanceLevel(): void {
     let next = this.levelIdx + 1;
     if (next >= this.levelIds.length) {
       next = 0;
       this.loop += 1;
     }
     this.startLevelAt(next);
+  }
+
+  // ---- boss ----
+  /** Debug entry: skip waves and spawn a boss immediately (?boss=ID). */
+  debugSpawnBoss(id: string): void {
+    this.enemyMgr.clearAll();
+    this.spawnBoss(id);
+  }
+
+  private spawnBoss(id: string): void {
+    const def = this.data.boss(id);
+    if (!def) {
+      this.advanceLevel();
+      return;
+    }
+    this.enemyMgr.clearAll();
+    this.bossDef = def;
+    this.bossArrived = false;
+    this.bossPhase = 0;
+    this.bossFireCd = def.fireRateMs;
+    this.bossRadialCd = 4000;
+    this.bossSway = 0;
+    this.levelName = def.name;
+    const core = this.make('boss', W / 2, -180);
+    core.hp = def.coreHp;
+    core.radius = def.size * 0.4;
+    core.scale = def.size;
+    core.color = hexToNum(def.tint);
+    this.bossCore = core;
+    this.bossParts = def.parts.map((pd) => {
+      const e = this.make('bosspart', W / 2 + pd.offsetX, -180 + pd.offsetY);
+      e.hp = pd.hp;
+      e.radius = pd.size * 0.45;
+      e.scale = pd.size;
+      e.color = hexToNum(pd.tint);
+      return { e, def: pd, cd: pd.fireRateMs };
+    });
+  }
+
+  private clearBoss(): void {
+    this.bossCore = null;
+    this.bossParts = [];
+    this.bossDef = null;
+    this.bossArrived = false;
+  }
+
+  private updateBoss(dtMs: number): void {
+    const core = this.bossCore;
+    const def = this.bossDef;
+    if (!core || !def) return;
+    const dt = dtMs / 1000;
+
+    if (!this.bossArrived) {
+      const py = core.y;
+      core.y = Math.min(def.entryY, core.y + 180 * dt);
+      core.x = W / 2;
+      core.vx = 0;
+      core.vy = (core.y - py) / dt;
+      this.positionParts(dt);
+      if (core.y >= def.entryY - 1) this.bossArrived = true;
+      return;
+    }
+
+    const frac = core.hp / def.coreHp;
+    const phase = frac > 0.66 ? 0 : frac > 0.33 ? 1 : 2;
+    if (phase > this.bossPhase) {
+      this.bossPhase = phase;
+      this.fx.push({ type: 'flash', color: hexToNum(def.tint), durMs: 220 });
+      this.fx.push({ type: 'shake', intensity: 0.012, durMs: 220 });
+    }
+    const fireMul = phase === 0 ? 1 : phase === 1 ? 0.7 : 0.5;
+    const swayMul = 1 + phase * 0.4;
+
+    this.bossSway += ((dtMs / def.swayMs) * Math.PI * 2) * swayMul;
+    const px = core.x;
+    core.x = W / 2 + Math.sin(this.bossSway) * def.swayAmp;
+    core.y = def.entryY;
+    core.vx = (core.x - px) / dt;
+    core.vy = 0;
+    this.positionParts(dt);
+
+    this.bossFireCd -= dtMs;
+    if (this.bossFireCd <= 0) {
+      this.bossFireCd = def.fireRateMs * fireMul;
+      this.bossSpread(core, def, phase);
+    }
+    if (phase >= 2) {
+      this.bossRadialCd -= dtMs;
+      if (this.bossRadialCd <= 0) {
+        this.bossRadialCd = 2600;
+        this.bossRadial(core, def);
+      }
+    }
+    for (const part of this.bossParts) {
+      if (!part.e.alive) continue;
+      part.cd -= dtMs;
+      if (part.cd <= 0) {
+        part.cd = part.def.fireRateMs * fireMul;
+        this.partFire(part, def);
+      }
+    }
+  }
+
+  private positionParts(dt: number): void {
+    const core = this.bossCore!;
+    for (const p of this.bossParts) {
+      if (!p.e.alive) continue;
+      const px = p.e.x;
+      p.e.x = core.x + p.def.offsetX;
+      p.e.y = core.y + p.def.offsetY;
+      p.e.vx = (p.e.x - px) / dt;
+      p.e.vy = 0;
+    }
+  }
+
+  private bossSpread(core: Entity, def: BossDef, phase: number): void {
+    const sp = def.bulletSpeed;
+    const n = 5 + phase * 2;
+    const player = this.playerPos();
+    const base = Math.atan2(player.y - core.y, player.x - core.x);
+    for (let i = 0; i < n; i++) {
+      const ang = base + (i - (n - 1) / 2) * 0.16;
+      this.enemyFire(core.x, core.y + 30, Math.cos(ang) * sp, Math.max(80, Math.sin(ang) * sp));
+    }
+  }
+
+  private bossRadial(core: Entity, def: BossDef): void {
+    const sp = def.bulletSpeed * 0.8;
+    for (let i = 0; i < 16; i++) {
+      const ang = (i / 16) * Math.PI * 2;
+      this.enemyFire(core.x, core.y, Math.cos(ang) * sp, Math.sin(ang) * sp);
+    }
+  }
+
+  private partFire(part: { e: Entity; def: BossPartDef }, def: BossDef): void {
+    if (part.def.pattern === 'none') return;
+    const sp = def.bulletSpeed;
+    const player = this.playerPos();
+    const base = Math.atan2(player.y - part.e.y, player.x - part.e.x);
+    const shots = part.def.pattern === 'spread' ? [-0.18, 0, 0.18] : [0];
+    for (const off of shots) {
+      const ang = base + off;
+      this.enemyFire(part.e.x, part.e.y + 10, Math.cos(ang) * sp, Math.max(70, Math.sin(ang) * sp));
+    }
+  }
+
+  private bossDefeated(): void {
+    const def = this.bossDef!;
+    const core = this.bossCore!;
+    this.fx.push({ type: 'flash', color: 0xffffff, durMs: 300 });
+    this.fx.push({ type: 'shake', intensity: 0.025, durMs: 500 });
+    for (let i = 0; i < 6; i++) {
+      this.fx.push({ type: 'burst', x: core.x + (Math.random() - 0.5) * 130, y: core.y + (Math.random() - 0.5) * 90, color: hexToNum(def.tint), count: 18 });
+    }
+    this.score += def.scoreValue;
+    this.runCoins += def.coinValue;
+    this.fx.push({ type: 'pop', x: core.x, y: core.y, text: `+${def.scoreValue}`, color: hexToNum(this.theme.palette.text) });
+    this.bossDone = true;
+    this.clearBoss();
+    this.advanceLevel();
+  }
+
+  get bossHp(): number {
+    return this.bossCore && this.bossDef ? this.bossCore.hp / this.bossDef.coreHp : -1;
+  }
+  get bossName(): string {
+    return this.bossDef?.name ?? '';
   }
 
   // ---- render/UI interface ----
@@ -573,6 +793,8 @@ export class World implements EnemyHost {
   }
   forEach(cb: (e: Entity) => void): void {
     if (this.playerE.alive) cb(this.playerE);
+    if (this.bossCore) cb(this.bossCore);
+    for (const p of this.bossParts) if (p.e.alive) cb(p.e);
     for (const e of this.enemyMgr.enemies) cb(e);
     for (const b of this.bullets) cb(b);
     for (const b of this.ebullets) cb(b);

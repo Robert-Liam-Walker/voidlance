@@ -30,6 +30,7 @@ const validateList = (items, schemaId, idOf) => {
 
 const enemies = validateList(readDir('enemies'), 'enemy.schema.json', (e) => e.id);
 const levels = validateList(readDir('levels'), 'level.schema.json', (l) => l.id);
+const bosses = validateList(readDir('bosses'), 'boss.schema.json', (b) => b.id);
 const powerups = validateList(readDir('powerups'), 'powerup.schema.json', (p) => p.id);
 const themes = validateList(readDir('themes'), 'theme.schema.json', (t) => t.id);
 const economy = readJson(join(root, 'economy.json'));
@@ -45,6 +46,7 @@ for (const t of themes) {
     for (const w of lvl.waves)
       if (w.rosterIndex >= t.enemyRosterIds.length)
         errors.push(`level ${id}: rosterIndex ${w.rosterIndex} out of range for theme ${t.id} (roster=${t.enemyRosterIds.length})`);
+    if (lvl.bossId && !has(bosses, lvl.bossId)) errors.push(`level ${id}: missing boss ${lvl.bossId}`);
   }
 }
 
@@ -54,5 +56,5 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `[validate-data] OK — ${enemies.length} enemies, ${levels.length} levels, ${powerups.length} powerups, ${themes.length} themes, ${economy.upgrades.length} upgrades`
+  `[validate-data] OK — ${enemies.length} enemies, ${levels.length} levels, ${bosses.length} bosses, ${powerups.length} powerups, ${themes.length} themes, ${economy.upgrades.length} upgrades`
 );

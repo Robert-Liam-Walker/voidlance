@@ -1,6 +1,7 @@
 {
   "id": "level-05",
   "name": "Special Forces",
+  "bossId": "warden",
   "waves": [
     { "rosterIndex": 6, "rows": 1, "cols": 2, "spacingX": 260, "spacingY": 60, "startY": 170, "entryStaggerMs": 300 },
     { "rosterIndex": 7, "rows": 1, "cols": 2, "spacingX": 200, "spacingY": 60, "startY": 200, "entryStaggerMs": 250 },
