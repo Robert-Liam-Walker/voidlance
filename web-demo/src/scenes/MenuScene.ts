@@ -56,8 +56,8 @@ export class MenuScene extends Phaser.Scene {
       glow(g, hexToNum(p.accent), 4, 9);
     }
     label(this, x, y - 50, t.name.toUpperCase(), 23, lighten(p.accent, 0.25), { weight: '700', display: true });
-    const ship = this.add.image(x, y + 8, t.player.shape === 'wasp' ? 'ship-wasp' : 'ship-arrow').setTint(hexToNum(t.player.tint)).setScale(0.95);
-    glow(ship, hexToNum(t.player.tint), 4, 8);
+    const ship = this.add.image(x, y + 8, t.player.sprite).setScale(0.6);
+    glow(ship, hexToNum(t.player.tint), 5, 10);
     label(this, x, y + 54, selected ? 'ACTIVE' : 'TAP TO SWITCH', 14, selected ? lighten(p.accent, 0.2) : p.text, { weight: '600' }).setAlpha(
       selected ? 1 : 0.6
     );

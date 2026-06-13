@@ -45,8 +45,9 @@ export class GameScene extends Phaser.Scene {
     this.levelIds = this.theme.levelIds.slice();
 
     this.bg = new Nebula(this, this.theme);
-    this.playerBullets = new Bullets(this, 'bullet', 256, Phaser.BlendModes.ADD);
-    this.enemyBullets = new Bullets(this, 'enemy-bullet', 256, Phaser.BlendModes.ADD);
+    const enemyBulletKey = s.data.enemy(this.theme.enemyRosterIds[0])?.bulletSprite ?? 'laserRed01';
+    this.playerBullets = new Bullets(this, this.theme.player.bulletSprite, 256, Phaser.BlendModes.ADD);
+    this.enemyBullets = new Bullets(this, enemyBulletKey, 256, Phaser.BlendModes.ADD);
     this.player = new Player(this, this.theme, s.economy.stats(this.theme), this.playerBullets);
     this.enemies = new EnemyManager(this, s.data, this.theme, this.enemyBullets, () => this.player, () => this.onLevelCleared());
 
@@ -112,7 +113,7 @@ export class GameScene extends Phaser.Scene {
     enemy.hp -= this.player.damage;
     enemy.setTintFill(0xffffff);
     this.time.delayedCall(40, () => {
-      if (enemy.active) enemy.setTint(hexToNum(enemy.def.tint));
+      if (enemy.active) enemy.clearTint();
     });
     if (enemy.hp <= 0) this.killEnemy(enemy);
   }
@@ -152,10 +153,10 @@ export class GameScene extends Phaser.Scene {
         this
       );
     }
-    const drop = this.powerUps.create(x, y, 'powerup') as Phaser.Physics.Arcade.Sprite;
-    drop.setTint(hexToNum(pu.tint)).setDepth(9).setData('puId', pu.id);
+    const drop = this.powerUps.create(x, y, pu.sprite) as Phaser.Physics.Arcade.Sprite;
+    drop.setDepth(9).setData('puId', pu.id);
     (drop.body as Phaser.Physics.Arcade.Body).setVelocity(0, 95);
-    this.tweens.add({ targets: drop, scale: { from: 0.7, to: 1.15 }, yoyo: true, repeat: -1, duration: 500 });
+    this.tweens.add({ targets: drop, scale: { from: 0.7, to: 1.05 }, yoyo: true, repeat: -1, duration: 500 });
   }
 
   private collectPowerUp(drop: Phaser.Physics.Arcade.Sprite): void {

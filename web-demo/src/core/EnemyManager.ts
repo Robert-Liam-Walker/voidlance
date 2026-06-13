@@ -3,14 +3,6 @@ import type { ThemeDef, LevelDef, WaveDef } from '../data/types';
 import type { GameData } from '../data/loader';
 import { Enemy } from './Enemy';
 import type { Bullets } from './Bullets';
-import { hexToNum } from '../util/color';
-
-const ENEMY_TEX: Record<string, string> = {
-  drone: 'enemy-drone',
-  wing: 'enemy-wing',
-  bug: 'enemy-bug',
-  diamond: 'enemy-diamond',
-};
 
 type Vec = { x: number; y: number };
 
@@ -52,7 +44,7 @@ export class EnemyManager {
     this.diveTimer = wave.diveIntervalMs ?? 1200;
 
     const def = this.data.enemyForWave(this.theme, wave);
-    const tex = ENEMY_TEX[def.shape] ?? 'enemy-drone';
+    const tex = def.sprite;
     const hp = def.hp + Math.floor(this.loop);
     const W = this.scene.scale.width;
     const totalW = (wave.cols - 1) * wave.spacingX;
@@ -180,7 +172,7 @@ export class EnemyManager {
   private enemyFire(e: Enemy, player: Vec): void {
     const sp = e.def.bulletSpeed ?? 240;
     const ang = Math.atan2(player.y - e.y, player.x - e.x);
-    this.enemyBullets.fire(e.x, e.y + 14, Math.cos(ang) * sp, Math.max(70, Math.sin(ang) * sp), hexToNum(e.def.tint), 1);
+    this.enemyBullets.fire(e.x, e.y + 14, Math.cos(ang) * sp, Math.max(70, Math.sin(ang) * sp), 0xffffff, 0.7);
   }
 
   activeCount(): number {

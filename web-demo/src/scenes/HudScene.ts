@@ -38,13 +38,10 @@ export class HudScene extends Phaser.Scene {
     this.comboText = label(this, W / 2, 52, '', 23, lighten(p.accent, 0.2), { weight: '700', display: true });
     glow(this.comboText, hexToNum(p.accent), 3, 8);
 
-    const lifeKey = theme.player.shape === 'wasp' ? 'ship-wasp' : 'ship-arrow';
-    const lifeTint = hexToNum(theme.player.tint);
+    const lifeKey = theme.player.sprite;
     const maxHp = (this.registry.get('maxHp') as number) ?? 3;
     for (let i = 0; i < maxHp; i++) {
-      this.lives.push(
-        this.add.image(W - 26 - i * 30, 62, lifeKey).setTint(lifeTint).setScale(0.4)
-      );
+      this.lives.push(this.add.image(W - 24 - i * 34, 58, lifeKey).setScale(0.3));
     }
 
     const reg = this.registry;

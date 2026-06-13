@@ -11,6 +11,8 @@ export interface EnemyDef {
   coinValue: number;
   tint: string;
   speed: number;
+  sprite: string;
+  bulletSprite: string;
   fireChance?: number;
   bulletSpeed?: number;
 }
@@ -39,6 +41,7 @@ export interface PowerUpDef {
   durationMs: number;
   tint: string;
   dropChance: number;
+  sprite: string;
 }
 
 export interface ThemePalette {
@@ -57,6 +60,8 @@ export interface ThemePlayer {
   bulletSpeed: number;
   bulletDamage: number;
   maxHp: number;
+  sprite: string;
+  bulletSprite: string;
 }
 
 export interface ThemeBackground {
