@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { services } from '../services';
-import { Starfield } from '../core/Starfield';
-import { hexToNum } from '../util/color';
+import { Nebula } from '../core/Nebula';
+import { panel, button, heading, label } from '../core/ui';
+import { lighten } from '../util/color';
 
 interface GameOverData {
   score: number;
@@ -20,31 +21,29 @@ export class GameOverScene extends Phaser.Scene {
     const p = theme.palette;
     const W = this.scale.width;
     const H = this.scale.height;
-    new Starfield(this, theme);
+    new Nebula(this, theme);
 
-    this.add.text(W / 2, H * 0.26, 'RUN OVER', { fontFamily: 'monospace', fontSize: '58px', color: p.danger }).setOrigin(0.5);
-    this.add.text(W / 2, H * 0.26 + 50, theme.name, { fontFamily: 'monospace', fontSize: '24px', color: p.accent })
-      .setOrigin(0.5)
-      .setAlpha(0.85);
+    heading(this, W / 2, H * 0.24, 'RUN OVER', 60, { ...p, accent: p.danger });
+    label(this, W / 2, H * 0.24 + 46, theme.name.toUpperCase(), 22, lighten(p.accent, 0.2), { weight: '700', display: true }).setAlpha(0.9);
 
-    const lines = [`SCORE   ${data.score}`, data.isBest ? '*** NEW BEST ***' : `BEST    ${data.best}`, `COINS  +${data.coins}`];
-    this.add
-      .text(W / 2, H * 0.46, lines.join('\n'), { fontFamily: 'monospace', fontSize: '30px', color: p.text, align: 'center' })
-      .setOrigin(0.5)
-      .setLineSpacing(14);
+    panel(this, W / 2, H * 0.5, 470, 280, p, { fillAlpha: 0.78 });
+    const cx = W / 2;
+    let ry = H * 0.5 - 96;
+    const row = (k: string, v: string, hi = false): void => {
+      label(this, cx - 188, ry, k, 22, p.text, { originX: 0, weight: '600' }).setAlpha(0.7);
+      label(this, cx + 188, ry, v, 28, hi ? lighten(p.accent, 0.2) : lighten(p.text, 0.1), { originX: 1, weight: '700', display: true });
+      ry += 64;
+    };
+    row('SCORE', `${data.score}`);
+    if (data.isBest) {
+      label(this, cx, ry, '★ NEW BEST ★', 26, lighten(p.accent, 0.2), { weight: '700', display: true });
+      ry += 64;
+    } else {
+      row('BEST', `${data.best}`);
+    }
+    row('COINS', `+${data.coins}`, true);
 
-    this.button(W / 2, H * 0.66, 'RETRY', p.accent, p.bg, () => this.scene.start('Game'));
-    this.button(W / 2, H * 0.66 + 80, 'HANGAR', p.text, p.bgAccent, () => this.scene.start('Menu'));
-  }
-
-  private button(x: number, y: number, label: string, fg: string, bg: string, onClick: () => void): void {
-    const rect = this.add
-      .rectangle(x, y, 260, 60, hexToNum(bg))
-      .setStrokeStyle(2, hexToNum(fg))
-      .setInteractive({ useHandCursor: true });
-    this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: '26px', color: fg }).setOrigin(0.5);
-    rect.on('pointerover', () => rect.setFillStyle(hexToNum(fg), 0.18));
-    rect.on('pointerout', () => rect.setFillStyle(hexToNum(bg)));
-    rect.on('pointerup', onClick);
+    button(this, W / 2, H * 0.72, 300, 72, 'RETRY', p, () => this.scene.start('Game'), 32);
+    button(this, W / 2, H * 0.72 + 86, 300, 60, 'HANGAR', { ...p, accent: p.text }, () => this.scene.start('Menu'), 24);
   }
 }

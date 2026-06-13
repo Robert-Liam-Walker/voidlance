@@ -5,6 +5,7 @@ import { SaveStore } from '../systems/Save';
 import { Economy } from '../systems/Economy';
 import { ThemeManager } from '../systems/ThemeManager';
 import { setServices } from '../services';
+import { FONT } from '../core/ui';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -17,9 +18,39 @@ export class BootScene extends Phaser.Scene {
       const data = initData(); // validates canonical data; throws hard on error
       const save = new SaveStore(data.themes[0].id);
       setServices({ data, save, economy: new Economy(data, save), themes: new ThemeManager(data, save) });
-      this.scene.start('Menu');
     } catch (err) {
       this.showError(err);
+      return;
+    }
+    this.loadFontsThen(() => this.scene.start('Menu'));
+  }
+
+  private loadFontsThen(cb: () => void): void {
+    const W = this.scale.width;
+    const H = this.scale.height;
+    this.add.rectangle(W / 2, H / 2, W, H, 0x05030f);
+    this.add
+      .text(W / 2, H / 2, 'LOADING', { fontFamily: FONT.display, fontStyle: '700', fontSize: '30px', color: '#ffffff' })
+      .setOrigin(0.5)
+      .setAlpha(0.6);
+
+    let done = false;
+    const go = (): void => {
+      if (!done) {
+        done = true;
+        cb();
+      }
+    };
+    this.time.delayedCall(2600, go); // fallback so we never hang on font load
+
+    const docFonts = (document as unknown as { fonts?: { load: (f: string) => Promise<unknown>; ready: Promise<unknown> } }).fonts;
+    if (docFonts?.load) {
+      Promise.all(['700 24px Orbitron', '900 24px Orbitron', '600 20px Rajdhani', '700 20px Rajdhani'].map((f) => docFonts.load(f)))
+        .then(() => docFonts.ready)
+        .then(go)
+        .catch(go);
+    } else {
+      go();
     }
   }
 

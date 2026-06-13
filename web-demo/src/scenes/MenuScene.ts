@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { services } from '../services';
-import { Starfield } from '../core/Starfield';
-import { hexToNum } from '../util/color';
-import type { ThemeDef, ThemePalette } from '../data/types';
+import { Nebula } from '../core/Nebula';
+import { panel, button, heading, label, glow } from '../core/ui';
+import { hexToNum, lighten } from '../util/color';
+import type { ThemeDef } from '../data/types';
 
-// Title + theme portals (the Nova Lance <-> Void Hornet switch) + coins,
-// the one-upgrade Hangar panel, and Launch. Rebuilds via scene.restart().
+// Arcade title screen: beveled glowing logo, glossy theme portals (the Nova
+// Lance <-> Void Hornet switch), a coin/best chip, the Hangar upgrade panel,
+// and a pulsing Launch. Rebuilds via scene.restart().
 export class MenuScene extends Phaser.Scene {
   constructor() {
     super('Menu');
@@ -16,95 +18,76 @@ export class MenuScene extends Phaser.Scene {
     const theme = s.themes.active;
     const p = theme.palette;
     const W = this.scale.width;
-    const H = this.scale.height;
 
-    new Starfield(this, theme);
+    new Nebula(this, theme);
 
-    this.add.text(W / 2, H * 0.15, 'VOIDLANCE', { fontFamily: 'monospace', fontSize: '66px', color: p.accent }).setOrigin(0.5);
-    this.add.text(W / 2, H * 0.15 + 54, theme.tagline, { fontFamily: 'monospace', fontSize: '22px', color: p.text })
-      .setOrigin(0.5)
-      .setAlpha(0.85);
+    heading(this, W / 2, 150, 'VOIDLANCE', 78, p);
+    const bar = this.add.rectangle(W / 2, 202, 392, 6, hexToNum(p.accent)).setOrigin(0.5);
+    glow(bar, hexToNum(p.accent), 4, 10);
+    label(this, W / 2, 234, theme.tagline.toUpperCase(), 21, lighten(p.text, 0.05), { weight: '600' }).setAlpha(0.9);
 
     const themes = s.themes.list().slice(0, 2);
-    const gap = 250;
-    themes.forEach((t, i) => this.portal(W / 2 + (i === 0 ? -gap / 2 : gap / 2), H * 0.34, t, t.id === theme.id));
+    const gap = 252;
+    themes.forEach((t, i) => this.portal(W / 2 + (i === 0 ? -gap / 2 : gap / 2), 374, t, t.id === theme.id));
 
-    this.add
-      .text(W / 2, H * 0.5, `> ${s.economy.coins(theme.id)}    BEST ${s.economy.bestScore(theme.id)}`, {
-        fontFamily: 'monospace',
-        fontSize: '24px',
-        color: p.accent,
-      })
-      .setOrigin(0.5);
+    const chipY = 502;
+    panel(this, W / 2, chipY, 360, 54, p, { radius: 14, fillAlpha: 0.66 });
+    this.add.image(W / 2 - 124, chipY, 'coin').setTint(0xffd23f).setScale(0.8);
+    label(this, W / 2 - 104, chipY, `${s.economy.coins(theme.id)}`, 24, '#ffe27a', { originX: 0, weight: '700', display: true });
+    label(this, W / 2 + 8, chipY, `BEST ${s.economy.bestScore(theme.id)}`, 20, lighten(p.text, 0.05), { originX: 0, weight: '600' });
 
-    this.upgradePanel(W / 2, H * 0.6, theme);
-    this.launchButton(W / 2, H * 0.81, p);
+    this.hangar(W / 2, 632, theme);
 
-    this.add
-      .text(W / 2, H * 0.9, 'drag to move  -  auto-fire', { fontFamily: 'monospace', fontSize: '18px', color: p.text })
-      .setOrigin(0.5)
-      .setAlpha(0.5);
+    const launch = button(this, W / 2, 862, 320, 84, 'LAUNCH', p, () => this.scene.start('Game'), 38);
+    this.tweens.add({ targets: launch, scale: { from: 0.99, to: 1.03 }, yoyo: true, repeat: -1, duration: 950, ease: 'Sine.InOut' });
+
+    label(this, W / 2, 982, 'DRAG TO MOVE   ·   AUTO-FIRE', 18, lighten(p.text, 0.05), { weight: '500' }).setAlpha(0.55);
   }
 
   private portal(x: number, y: number, t: ThemeDef, selected: boolean): void {
     const p = t.palette;
-    const rect = this.add
-      .rectangle(x, y, 210, 124, hexToNum(p.bg))
-      .setStrokeStyle(selected ? 4 : 2, hexToNum(p.accent))
-      .setInteractive({ useHandCursor: true });
-    this.add.text(x, y - 38, t.name, { fontFamily: 'monospace', fontSize: '24px', color: p.accent }).setOrigin(0.5);
-    this.add
-      .image(x, y + 8, t.player.shape === 'wasp' ? 'ship-wasp' : 'ship-arrow')
-      .setTint(hexToNum(t.player.tint))
-      .setScale(0.85);
-    this.add
-      .text(x, y + 44, selected ? 'ACTIVE' : 'tap to switch', { fontFamily: 'monospace', fontSize: '14px', color: p.text })
-      .setOrigin(0.5)
-      .setAlpha(0.7);
-    rect.on('pointerup', () => {
+    const w = 232;
+    const h = 156;
+    panel(this, x, y, w, h, p, { fillAlpha: selected ? 0.86 : 0.62, borderAlpha: selected ? 1 : 0.45 });
+    if (selected) {
+      const g = this.add.graphics({ x, y });
+      g.lineStyle(3, hexToNum(p.accent), 1);
+      g.strokeRoundedRect(-w / 2, -h / 2, w, h, 16);
+      glow(g, hexToNum(p.accent), 4, 9);
+    }
+    label(this, x, y - 50, t.name.toUpperCase(), 23, lighten(p.accent, 0.25), { weight: '700', display: true });
+    const ship = this.add.image(x, y + 8, t.player.shape === 'wasp' ? 'ship-wasp' : 'ship-arrow').setTint(hexToNum(t.player.tint)).setScale(0.95);
+    glow(ship, hexToNum(t.player.tint), 4, 8);
+    label(this, x, y + 54, selected ? 'ACTIVE' : 'TAP TO SWITCH', 14, selected ? lighten(p.accent, 0.2) : p.text, { weight: '600' }).setAlpha(
+      selected ? 1 : 0.6
+    );
+    this.add.zone(x, y, w, h).setInteractive({ useHandCursor: true }).on('pointerup', () => {
       services().themes.setActive(t.id);
       this.scene.restart();
     });
   }
 
-  private upgradePanel(x: number, y: number, theme: ThemeDef): void {
+  private hangar(x: number, y: number, theme: ThemeDef): void {
     const s = services();
     const p = theme.palette;
+    panel(this, x, y, 584, 120, p, { fillAlpha: 0.72 });
+    label(this, x - 262, y - 32, 'HANGAR', 16, lighten(p.accent, 0.2), { originX: 0, weight: '700', display: true }).setAlpha(0.8);
+
     const upg = s.economy.upgrades()[0];
     const lvl = s.economy.level(theme.id, upg.id);
     const maxed = s.economy.isMaxed(theme.id, upg);
-    const canBuy = s.economy.canBuy(theme.id, upg);
 
-    this.add
-      .text(x - 150, y, `${upg.name}  Lv ${lvl}/${upg.maxLevel}`, { fontFamily: 'monospace', fontSize: '20px', color: p.text })
-      .setOrigin(0, 0.5);
-
-    const label = maxed ? 'MAX' : `BUY >${s.economy.cost(theme.id, upg)}`;
-    const tone = canBuy ? p.accent : p.text;
-    const btn = this.add
-      .rectangle(x + 150, y, 156, 42, hexToNum(canBuy ? p.accent : p.bgAccent), canBuy ? 0.2 : 0.12)
-      .setStrokeStyle(2, hexToNum(tone))
-      .setInteractive({ useHandCursor: !maxed });
-    this.add.text(x + 150, y, label, { fontFamily: 'monospace', fontSize: '18px', color: tone }).setOrigin(0.5);
-
-    if (!maxed) {
-      btn.on('pointerup', () => {
-        if (s.economy.buy(theme.id, upg)) this.scene.restart();
-      });
+    label(this, x - 262, y + 4, upg.name, 24, lighten(p.text, 0.05), { originX: 0, weight: '700' });
+    for (let i = 0; i < upg.maxLevel; i++) {
+      this.add
+        .rectangle(x - 260 + i * 28, y + 36, 22, 9, hexToNum(p.accent), i < lvl ? 0.9 : 0.12)
+        .setOrigin(0, 0.5)
+        .setStrokeStyle(1, hexToNum(p.accent), i < lvl ? 1 : 0.4);
     }
-  }
 
-  private launchButton(x: number, y: number, p: ThemePalette): void {
-    const c = this.add.container(x, y);
-    const rect = this.add
-      .rectangle(0, 0, 300, 74, hexToNum(p.accent), 0.16)
-      .setStrokeStyle(3, hexToNum(p.accent))
-      .setInteractive({ useHandCursor: true });
-    const txt = this.add.text(0, 0, 'LAUNCH', { fontFamily: 'monospace', fontSize: '36px', color: p.accent }).setOrigin(0.5);
-    rect.on('pointerover', () => rect.setFillStyle(hexToNum(p.accent), 0.3));
-    rect.on('pointerout', () => rect.setFillStyle(hexToNum(p.accent), 0.16));
-    rect.on('pointerup', () => this.scene.start('Game'));
-    c.add([rect, txt]);
-    this.tweens.add({ targets: c, scale: { from: 0.98, to: 1.02 }, yoyo: true, repeat: -1, duration: 900, ease: 'Sine.InOut' });
+    const txt = maxed ? 'MAX' : `BUY  ${s.economy.cost(theme.id, upg)}`;
+    button(this, x + 200, y, 152, 62, txt, p, () => {
+      if (!maxed && s.economy.buy(theme.id, upg)) this.scene.restart();
+    }, 22);
   }
 }

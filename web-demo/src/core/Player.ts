@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { ThemeDef } from '../data/types';
 import type { PlayerStats } from '../systems/Economy';
 import type { Bullets } from './Bullets';
+import { glow } from './ui';
 import { hexToNum } from '../util/color';
 
 // Pointer-drag movement (thumb) + auto-fire — the mobile-standard control scheme.
@@ -31,6 +32,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.hp = stats.maxHp;
     this.bulletTint = hexToNum(theme.player.bulletTint);
     this.setTint(hexToNum(theme.player.tint));
+    glow(this, hexToNum(theme.player.tint), 4, 8);
     this.setDepth(10);
     this.setDisplaySize(46, 50);
 
