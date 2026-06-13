@@ -64,6 +64,10 @@ export function injectStyles(theme: ThemeDef): void {
   .vl-hud .lives{position:absolute;top:36px;right:16px;display:flex;gap:5px;}
   .vl-hud .life{width:16px;height:16px;border-radius:3px;background:var(--accent);box-shadow:0 0 8px var(--accent);}
   .vl-hud .life.lost{opacity:.16;box-shadow:none;}
+  .vl-hud .boss{position:absolute;top:104px;left:8%;width:84%;display:none;flex-direction:column;align-items:center;gap:4px;}
+  .vl-hud .boss .name{font-family:'Orbitron',sans-serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--danger);text-shadow:0 0 8px var(--danger);}
+  .vl-hud .boss .track{width:100%;height:10px;background:rgba(255,255,255,.08);border:1px solid var(--danger);border-radius:6px;overflow:hidden;}
+  .vl-hud .boss .fill{height:100%;width:100%;background:var(--danger);box-shadow:0 0 12px var(--danger);transition:width .12s linear;}
   `;
   document.head.appendChild(el);
 }
@@ -123,6 +127,8 @@ export interface HudState {
   combo: number;
   weapon: string;
   level: string;
+  bossHp: number; // 0..1, or <0 when no boss
+  bossName: string;
 }
 
 export class Hud {
@@ -133,6 +139,9 @@ export class Hud {
   private comboEl: HTMLElement;
   private weaponEl: HTMLElement;
   private livesEl: HTMLElement;
+  private bossEl: HTMLElement;
+  private bossNameEl: HTMLElement;
+  private bossFillEl: HTMLElement;
   private lastMax = -1;
 
   constructor(host: HTMLElement) {
@@ -148,7 +157,13 @@ export class Hud {
     this.weaponEl = h('div', 'weapon', '');
     center.append(this.levelEl, this.comboEl, this.weaponEl);
     this.livesEl = h('div', 'lives');
-    this.el.append(score, this.coinsEl, center, this.livesEl);
+    this.bossEl = h('div', 'boss');
+    this.bossNameEl = h('div', 'name', '');
+    this.bossFillEl = h('div', 'fill');
+    const track = h('div', 'track');
+    track.append(this.bossFillEl);
+    this.bossEl.append(this.bossNameEl, track);
+    this.el.append(score, this.coinsEl, center, this.livesEl, this.bossEl);
     host.appendChild(this.el);
   }
 
@@ -165,6 +180,13 @@ export class Hud {
     }
     const lives = this.livesEl.children;
     for (let i = 0; i < lives.length; i++) (lives[i] as HTMLElement).className = `life${i < s.hp ? '' : ' lost'}`;
+    if (s.bossHp >= 0) {
+      this.bossEl.style.display = 'flex';
+      this.bossNameEl.textContent = s.bossName;
+      this.bossFillEl.style.width = `${Math.max(0, s.bossHp) * 100}%`;
+    } else {
+      this.bossEl.style.display = 'none';
+    }
   }
 
   destroy(): void {

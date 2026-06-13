@@ -3,7 +3,7 @@ import type { EnemyDef } from '../data/types';
 // One flat entity record for everything the sim simulates, in LOGICAL 720x1280
 // coords (y down). Per-kind fields are all present with defaults (set by
 // World.spawn) to keep access simple under strict TS.
-export type Kind = 'player' | 'enemy' | 'pbullet' | 'ebullet' | 'powerup' | 'barrier' | 'bot' | 'missile' | 'bomb';
+export type Kind = 'player' | 'enemy' | 'pbullet' | 'ebullet' | 'powerup' | 'barrier' | 'bot' | 'missile' | 'bomb' | 'boss' | 'bosspart';
 
 export type EnemyMode = 'enter' | 'formation' | 'dive' | 'return' | 'active';
 

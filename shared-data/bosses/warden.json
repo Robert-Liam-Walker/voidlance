@@ -1,0 +1,18 @@
+{
+  "id": "warden",
+  "name": "NOVA WARDEN",
+  "coreHp": 90,
+  "size": 240,
+  "entryY": 250,
+  "swayAmp": 170,
+  "swayMs": 4200,
+  "bulletSpeed": 250,
+  "fireRateMs": 1500,
+  "scoreValue": 3000,
+  "coinValue": 40,
+  "tint": "#ff5c6e",
+  "parts": [
+    { "id": "cannonL", "offsetX": -120, "offsetY": 36, "hp": 18, "size": 84, "fireRateMs": 1700, "pattern": "aimed", "tint": "#ff3df0" },
+    { "id": "cannonR", "offsetX": 120, "offsetY": 36, "hp": 18, "size": 84, "fireRateMs": 1700, "pattern": "aimed", "tint": "#ff3df0" }
+  ]
+}

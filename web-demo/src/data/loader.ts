@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import type { EnemyDef, LevelDef, PowerUpDef, ThemeDef, EconomyDef, WaveDef } from './types';
+import type { EnemyDef, LevelDef, PowerUpDef, ThemeDef, EconomyDef, WaveDef, BossDef } from './types';
 
 // Canonical data is mirrored into src/shared-data.generated/ by scripts/sync-data.mjs
 // (build output, gitignored). We import + validate it against the same schemas.
@@ -7,6 +7,7 @@ interface JsonModule<T> { default: T }
 const schemaModules = import.meta.glob('../shared-data.generated/schema/*.json', { eager: true });
 const enemyModules = import.meta.glob('../shared-data.generated/enemies/*.json', { eager: true });
 const levelModules = import.meta.glob('../shared-data.generated/levels/*.json', { eager: true });
+const bossModules = import.meta.glob('../shared-data.generated/bosses/*.json', { eager: true });
 const powerupModules = import.meta.glob('../shared-data.generated/powerups/*.json', { eager: true });
 const themeModules = import.meta.glob('../shared-data.generated/themes/*.json', { eager: true });
 const economyModules = import.meta.glob('../shared-data.generated/economy.json', { eager: true });
@@ -18,11 +19,13 @@ function vals<T>(mods: Record<string, unknown>): T[] {
 export interface GameData {
   enemies: EnemyDef[];
   levels: LevelDef[];
+  bosses: BossDef[];
   powerups: PowerUpDef[];
   themes: ThemeDef[];
   economy: EconomyDef;
   enemy(id: string): EnemyDef | undefined;
   level(id: string): LevelDef | undefined;
+  boss(id: string): BossDef | undefined;
   powerup(id: string): PowerUpDef | undefined;
   theme(id: string): ThemeDef | undefined;
   enemyForWave(theme: ThemeDef, wave: WaveDef): EnemyDef;
@@ -48,6 +51,7 @@ export function initData(): GameData {
 
   const enemies = validate(vals<EnemyDef>(enemyModules), 'enemy.schema.json', (e) => e.id);
   const levels = validate(vals<LevelDef>(levelModules), 'level.schema.json', (l) => l.id);
+  const bosses = validate(vals<BossDef>(bossModules), 'boss.schema.json', (b) => b.id);
   const powerups = validate(vals<PowerUpDef>(powerupModules), 'powerup.schema.json', (p) => p.id);
   const themes = validate(vals<ThemeDef>(themeModules), 'theme.schema.json', (t) => t.id);
   const economy = validate(vals<EconomyDef>(economyModules), 'economy.schema.json', () => 'economy')[0];
@@ -56,6 +60,7 @@ export function initData(): GameData {
 
   const enemyById = new Map(enemies.map((e) => [e.id, e]));
   const levelById = new Map(levels.map((l) => [l.id, l]));
+  const bossById = new Map(bosses.map((b) => [b.id, b]));
   const powerupById = new Map(powerups.map((p) => [p.id, p]));
   const themeById = new Map(themes.map((t) => [t.id, t]));
 
@@ -71,13 +76,15 @@ export function initData(): GameData {
           throw new Error(`[data] level ${id}: rosterIndex ${w.rosterIndex} out of range for theme ${t.id}`);
         }
       }
+      if (lvl.bossId && !bossById.has(lvl.bossId)) throw new Error(`[data] level ${id}: missing boss ${lvl.bossId}`);
     }
   }
 
   cached = {
-    enemies, levels, powerups, themes, economy,
+    enemies, levels, bosses, powerups, themes, economy,
     enemy: (id) => enemyById.get(id),
     level: (id) => levelById.get(id),
+    boss: (id) => bossById.get(id),
     powerup: (id) => powerupById.get(id),
     theme: (id) => themeById.get(id),
     enemyForWave: (theme, wave) => {

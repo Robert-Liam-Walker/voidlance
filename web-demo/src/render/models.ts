@@ -21,6 +21,8 @@ const FILES: Record<string, string> = {
   emitter: 'craft_speederD',
   phantom: 'alien',
   interceptor: 'craft_racer',
+  boss: 'craft_cargoB',
+  bosspart: 'craft_speederC',
 };
 
 const templates = new Map<string, THREE.Object3D>();

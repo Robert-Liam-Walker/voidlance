@@ -31,7 +31,35 @@ export interface WaveDef {
 export interface LevelDef {
   id: string;
   name: string;
+  bossId?: string;
   waves: WaveDef[];
+}
+
+export interface BossPartDef {
+  id: string;
+  offsetX: number;
+  offsetY: number;
+  hp: number;
+  size: number;
+  fireRateMs: number;
+  pattern: 'aimed' | 'spread' | 'none';
+  tint: string;
+}
+
+export interface BossDef {
+  id: string;
+  name: string;
+  coreHp: number;
+  size: number;
+  entryY: number;
+  swayAmp: number;
+  swayMs: number;
+  bulletSpeed: number;
+  fireRateMs: number;
+  scoreValue: number;
+  coinValue: number;
+  tint: string;
+  parts: BossPartDef[];
 }
 
 export interface PowerUpDef {

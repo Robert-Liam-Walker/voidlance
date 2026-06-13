@@ -23,6 +23,7 @@ export class Game {
   private overlay: MenuHandle | null = null;
   private state: State = 'menu';
   private debugLvl: number;
+  private debugBoss: string | null;
   private last = 0;
 
   frames = 0;
@@ -37,14 +38,22 @@ export class Game {
     this.screenHost = layer(mount, true);
     this.hudHost = layer(mount, false);
 
-    const lvl = parseInt(new URLSearchParams(location.search).get('lvl') ?? '', 10);
+    const params = new URLSearchParams(location.search);
+    const lvl = parseInt(params.get('lvl') ?? '', 10);
     this.debugLvl = Number.isFinite(lvl) ? Math.max(0, Math.min(lvl, theme.levelIds.length - 1)) : -1;
+    this.debugBoss = params.get('boss');
   }
 
   start(): void {
     this.last = performance.now();
-    if (this.debugLvl >= 0) this.startRun(this.debugLvl);
-    else this.showMenu();
+    if (this.debugBoss) {
+      this.startRun(this.debugLvl >= 0 ? this.debugLvl : 0);
+      this.world?.debugSpawnBoss(this.debugBoss);
+    } else if (this.debugLvl >= 0) {
+      this.startRun(this.debugLvl);
+    } else {
+      this.showMenu();
+    }
     requestAnimationFrame(this.loop);
   }
 
@@ -111,6 +120,8 @@ export class Game {
         combo: this.world.combo,
         weapon: this.world.weaponText,
         level: this.world.levelName,
+        bossHp: this.world.bossHp,
+        bossName: this.world.bossName,
       });
     }
     this.renderer.frame(dt);

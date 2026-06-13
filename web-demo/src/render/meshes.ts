@@ -27,6 +27,10 @@ export function createMesh(e: Entity): THREE.Object3D {
       return missile(e.color, e.scale);
     case 'bomb':
       return bomb(e.color, e.scale);
+    case 'boss':
+      return ship(e.color, true, e.scale, 'boss');
+    case 'bosspart':
+      return ship(e.color, true, e.scale, 'bosspart');
   }
 }
 
