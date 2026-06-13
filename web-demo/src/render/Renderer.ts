@@ -21,7 +21,6 @@ export class Renderer {
   private rolls = new Map<number, number>();
   private raycaster = new THREE.Raycaster();
   private ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), -HOVER_Y);
-  private grid: THREE.GridHelper;
   private stars: THREE.Points;
   private fx: FxLayer;
   private aspect = 9 / 16;
@@ -53,11 +52,6 @@ export class Renderer {
     const fill = new THREE.PointLight(accent, 1.3, 240);
     fill.position.set(0, 34, 46);
     this.scene.add(fill);
-
-    this.grid = new THREE.GridHelper(280, 56, accent, colorOf(theme.palette.bgAccent));
-    (this.grid.material as THREE.Material).transparent = true;
-    (this.grid.material as THREE.Material).opacity = 0.5;
-    this.scene.add(this.grid);
 
     this.stars = makeStars(colorOf(theme.background.starTint));
     this.scene.add(this.stars);
@@ -142,8 +136,6 @@ export class Renderer {
   }
 
   private scrollBackground(dt: number): void {
-    const cell = 280 / 56;
-    this.grid.position.z = (this.grid.position.z + 26 * dt) % cell;
     const pos = this.stars.geometry.getAttribute('position') as THREE.BufferAttribute;
     for (let i = 0; i < pos.count; i++) {
       let z = pos.getZ(i) + 30 * dt;
