@@ -1,0 +1,9 @@
+{
+  "id": "nuke",
+  "name": "Nuke",
+  "type": "nuke",
+  "durationMs": 0,
+  "tint": "#ff8a1e",
+  "dropChance": 0.04,
+  "sprite": "powerupRed_star"
+}

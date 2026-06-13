@@ -1,0 +1,15 @@
+{
+  "id": "phantom",
+  "name": "Phantom",
+  "hp": 4,
+  "behavior": "phantom",
+  "size": 46,
+  "scoreValue": 220,
+  "coinValue": 5,
+  "tint": "#6a9aff",
+  "speed": 95,
+  "sprite": "enemyBlue3",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 250
+}

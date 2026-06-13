@@ -26,6 +26,24 @@ export function buildTextures(scene: Phaser.Scene): void {
     g.fillStyle(C, 1);
     g.fillCircle(14, 14, 4.5);
   });
+  make('barrier', 54, 34, () => {
+    g.fillStyle(C, 1);
+    g.fillRoundedRect(0, 0, 54, 34, 7);
+  });
+  make('bomb', 26, 26, () => {
+    g.fillStyle(C, 1);
+    g.fillCircle(13, 13, 11);
+  });
+  make('bot', 18, 18, () => {
+    g.lineStyle(3, C, 1);
+    g.strokeCircle(9, 9, 6);
+    g.fillStyle(C, 1);
+    g.fillCircle(9, 9, 2.5);
+  });
+  make('missile', 12, 22, () => {
+    g.fillStyle(C, 1);
+    g.fillPoints([{ x: 6, y: 0 }, { x: 12, y: 14 }, { x: 9, y: 22 }, { x: 3, y: 22 }, { x: 0, y: 14 }], true);
+  });
   make('startile', 128, 128, () => {
     const rng = new Phaser.Math.RandomDataGenerator(['voidlance-stars']);
     for (let i = 0; i < 28; i++) {

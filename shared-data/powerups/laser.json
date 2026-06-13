@@ -1,0 +1,9 @@
+{
+  "id": "laser",
+  "name": "Laser",
+  "type": "laser",
+  "durationMs": 0,
+  "tint": "#36a0ff",
+  "dropChance": 0.06,
+  "sprite": "powerupBlue_bolt"
+}

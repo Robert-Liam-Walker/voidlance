@@ -1,8 +1,9 @@
 {
   "id": "level-03",
-  "name": "Sector 3",
+  "name": "Behind the Wall",
   "waves": [
-    { "rosterIndex": 0, "rows": 4, "cols": 9, "spacingX": 66, "spacingY": 56, "startY": 180, "entryStaggerMs": 55, "diveIntervalMs": 900 },
-    { "rosterIndex": 0, "rows": 4, "cols": 10, "spacingX": 64, "spacingY": 54, "startY": 170, "entryStaggerMs": 45, "diveIntervalMs": 780 }
+    { "rosterIndex": 2, "rows": 1, "cols": 5, "spacingX": 112, "spacingY": 60, "startY": 180, "entryStaggerMs": 140 },
+    { "rosterIndex": 0, "rows": 2, "cols": 6, "spacingX": 74, "spacingY": 62, "startY": 210, "entryStaggerMs": 90, "diveIntervalMs": 1100 },
+    { "rosterIndex": 3, "rows": 1, "cols": 2, "spacingX": 220, "spacingY": 60, "startY": 150, "entryStaggerMs": 200 }
   ]
 }

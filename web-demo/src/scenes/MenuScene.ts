@@ -30,7 +30,7 @@ export class MenuScene extends Phaser.Scene {
     const gap = 252;
     themes.forEach((t, i) => this.portal(W / 2 + (i === 0 ? -gap / 2 : gap / 2), 374, t, t.id === theme.id));
 
-    const chipY = 502;
+    const chipY = 476;
     panel(this, W / 2, chipY, 360, 54, p, { radius: 14, fillAlpha: 0.66 });
     this.add.image(W / 2 - 124, chipY, 'coin').setTint(0xffd23f).setScale(0.8);
     label(this, W / 2 - 104, chipY, `${s.economy.coins(theme.id)}`, 24, '#ffe27a', { originX: 0, weight: '700', display: true });
@@ -38,10 +38,10 @@ export class MenuScene extends Phaser.Scene {
 
     this.hangar(W / 2, 632, theme);
 
-    const launch = button(this, W / 2, 862, 320, 84, 'LAUNCH', p, () => this.scene.start('Game'), 38);
+    const launch = button(this, W / 2, 876, 320, 80, 'LAUNCH', p, () => this.scene.start('Game'), 38);
     this.tweens.add({ targets: launch, scale: { from: 0.99, to: 1.03 }, yoyo: true, repeat: -1, duration: 950, ease: 'Sine.InOut' });
 
-    label(this, W / 2, 982, 'DRAG TO MOVE   ·   AUTO-FIRE', 18, lighten(p.text, 0.05), { weight: '500' }).setAlpha(0.55);
+    label(this, W / 2, 986, 'DRAG TO MOVE   ·   AUTO-FIRE', 18, lighten(p.text, 0.05), { weight: '500' }).setAlpha(0.55);
   }
 
   private portal(x: number, y: number, t: ThemeDef, selected: boolean): void {
@@ -70,24 +70,28 @@ export class MenuScene extends Phaser.Scene {
   private hangar(x: number, y: number, theme: ThemeDef): void {
     const s = services();
     const p = theme.palette;
-    panel(this, x, y, 584, 120, p, { fillAlpha: 0.72 });
-    label(this, x - 262, y - 32, 'HANGAR', 16, lighten(p.accent, 0.2), { originX: 0, weight: '700', display: true }).setAlpha(0.8);
+    const upgrades = s.economy.upgrades();
+    const rowH = 60;
+    const panelH = 50 + upgrades.length * rowH;
+    panel(this, x, y, 604, panelH, p, { fillAlpha: 0.72 });
+    label(this, x - 276, y - panelH / 2 + 22, 'HANGAR', 16, lighten(p.accent, 0.2), { originX: 0, weight: '700', display: true }).setAlpha(0.8);
 
-    const upg = s.economy.upgrades()[0];
-    const lvl = s.economy.level(theme.id, upg.id);
-    const maxed = s.economy.isMaxed(theme.id, upg);
-
-    label(this, x - 262, y + 4, upg.name, 24, lighten(p.text, 0.05), { originX: 0, weight: '700' });
-    for (let i = 0; i < upg.maxLevel; i++) {
-      this.add
-        .rectangle(x - 260 + i * 28, y + 36, 22, 9, hexToNum(p.accent), i < lvl ? 0.9 : 0.12)
-        .setOrigin(0, 0.5)
-        .setStrokeStyle(1, hexToNum(p.accent), i < lvl ? 1 : 0.4);
+    let ry = y - panelH / 2 + 60;
+    for (const upg of upgrades) {
+      const lvl = s.economy.level(theme.id, upg.id);
+      const maxed = s.economy.isMaxed(theme.id, upg);
+      label(this, x - 276, ry - 9, upg.name, 21, lighten(p.text, 0.05), { originX: 0, weight: '700' });
+      for (let i = 0; i < upg.maxLevel; i++) {
+        this.add
+          .rectangle(x - 276 + i * 22, ry + 15, 16, 8, hexToNum(p.accent), i < lvl ? 0.9 : 0.12)
+          .setOrigin(0, 0.5)
+          .setStrokeStyle(1, hexToNum(p.accent), i < lvl ? 1 : 0.4);
+      }
+      const txt = maxed ? 'MAX' : `> ${s.economy.cost(theme.id, upg)}`;
+      button(this, x + 232, ry + 2, 116, 48, txt, p, () => {
+        if (!maxed && s.economy.buy(theme.id, upg)) this.scene.restart();
+      }, 18);
+      ry += rowH;
     }
-
-    const txt = maxed ? 'MAX' : `BUY  ${s.economy.cost(theme.id, upg)}`;
-    button(this, x + 200, y, 152, 62, txt, p, () => {
-      if (!maxed && s.economy.buy(theme.id, upg)) this.scene.restart();
-    }, 22);
   }
 }

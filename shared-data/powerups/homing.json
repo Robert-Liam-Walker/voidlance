@@ -1,0 +1,9 @@
+{
+  "id": "homing",
+  "name": "Homing Missiles",
+  "type": "homing",
+  "durationMs": 0,
+  "tint": "#ff5a5a",
+  "dropChance": 0.07,
+  "sprite": "powerupRed_bolt"
+}

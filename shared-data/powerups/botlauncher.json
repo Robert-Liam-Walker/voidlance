@@ -1,0 +1,9 @@
+{
+  "id": "botlauncher",
+  "name": "Bot Launcher",
+  "type": "botLauncher",
+  "durationMs": 9000,
+  "tint": "#ffd23f",
+  "dropChance": 0.06,
+  "sprite": "powerupYellow_star"
+}

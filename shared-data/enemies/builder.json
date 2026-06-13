@@ -1,0 +1,15 @@
+{
+  "id": "builder",
+  "name": "Builder",
+  "hp": 3,
+  "behavior": "builder",
+  "size": 46,
+  "scoreValue": 150,
+  "coinValue": 3,
+  "tint": "#9aa6b4",
+  "speed": 60,
+  "sprite": "enemyBlack3",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 0
+}

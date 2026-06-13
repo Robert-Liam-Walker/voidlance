@@ -1,0 +1,15 @@
+{
+  "id": "emitter",
+  "name": "Emitter",
+  "hp": 5,
+  "behavior": "emitter",
+  "size": 48,
+  "scoreValue": 200,
+  "coinValue": 4,
+  "tint": "#a6ff3a",
+  "speed": 60,
+  "sprite": "enemyGreen2",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0,
+  "bulletSpeed": 0
+}

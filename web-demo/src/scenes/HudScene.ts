@@ -10,6 +10,7 @@ export class HudScene extends Phaser.Scene {
   private coinsText!: Phaser.GameObjects.Text;
   private levelText!: Phaser.GameObjects.Text;
   private comboText!: Phaser.GameObjects.Text;
+  private weaponText!: Phaser.GameObjects.Text;
   private lives: Phaser.GameObjects.Image[] = [];
 
   constructor() {
@@ -37,6 +38,7 @@ export class HudScene extends Phaser.Scene {
     this.levelText = label(this, W / 2, 22, '', 20, lighten(p.text, 0.05), { weight: '600' }).setAlpha(0.85);
     this.comboText = label(this, W / 2, 52, '', 23, lighten(p.accent, 0.2), { weight: '700', display: true });
     glow(this.comboText, hexToNum(p.accent), 3, 8);
+    this.weaponText = label(this, W / 2, 84, '', 17, lighten(p.accent, 0.35), { weight: '700', display: true }).setAlpha(0.92);
 
     const lifeKey = theme.player.sprite;
     const maxHp = (this.registry.get('maxHp') as number) ?? 3;
@@ -58,6 +60,7 @@ export class HudScene extends Phaser.Scene {
     this.levelText.setText((reg.get('levelName') as string) ?? '');
     const combo = num('combo');
     this.comboText.setText(combo > 1 ? `COMBO x${combo}` : '');
+    this.weaponText.setText((reg.get('weapon') as string) ?? '');
     const hp = num('hp');
     for (let i = 0; i < this.lives.length; i++) this.lives[i].setAlpha(i < hp ? 1 : 0.16);
   }

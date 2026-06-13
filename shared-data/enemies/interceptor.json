@@ -1,0 +1,15 @@
+{
+  "id": "interceptor",
+  "name": "Interceptor",
+  "hp": 2,
+  "behavior": "interceptor",
+  "size": 42,
+  "scoreValue": 150,
+  "coinValue": 3,
+  "tint": "#3ad0ff",
+  "speed": 160,
+  "sprite": "enemyBlue1",
+  "bulletSprite": "laserRed01",
+  "fireChance": 0.3,
+  "bulletSpeed": 265
+}
