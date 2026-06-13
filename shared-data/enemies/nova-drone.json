@@ -1,13 +1,15 @@
 {
   "id": "nova-drone",
-  "name": "Neon Drone",
+  "name": "Raider",
   "hp": 2,
   "shape": "drone",
-  "size": 36,
+  "size": 44,
   "scoreValue": 100,
   "coinValue": 2,
-  "tint": "#36e0ff",
+  "tint": "#ff6a3a",
   "speed": 90,
+  "sprite": "enemyRed1",
+  "bulletSprite": "laserRed01",
   "fireChance": 0.14,
   "bulletSpeed": 260
 }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { buildTextures } from '../core/textures';
 import { initData } from '../data/loader';
+import type { GameData } from '../data/loader';
 import { SaveStore } from '../systems/Save';
 import { Economy } from '../systems/Economy';
 import { ThemeManager } from '../systems/ThemeManager';
@@ -8,20 +9,46 @@ import { setServices } from '../services';
 import { FONT } from '../core/ui';
 
 export class BootScene extends Phaser.Scene {
+  private gameData?: GameData;
+  private bootError: unknown = null;
+
   constructor() {
     super('Boot');
   }
 
+  init(): void {
+    // Validate canonical data before preload so we can load the sprites it references.
+    try {
+      this.gameData = initData();
+    } catch (err) {
+      this.bootError = err;
+    }
+  }
+
+  preload(): void {
+    if (!this.gameData) return;
+    const keys = new Set<string>();
+    for (const t of this.gameData.themes) {
+      keys.add(t.player.sprite);
+      keys.add(t.player.bulletSprite);
+    }
+    for (const e of this.gameData.enemies) {
+      keys.add(e.sprite);
+      keys.add(e.bulletSprite);
+    }
+    for (const p of this.gameData.powerups) keys.add(p.sprite);
+    for (const k of keys) this.load.image(k, `sprites/${k}.png`);
+  }
+
   create(): void {
     buildTextures(this);
-    try {
-      const data = initData(); // validates canonical data; throws hard on error
-      const save = new SaveStore(data.themes[0].id);
-      setServices({ data, save, economy: new Economy(data, save), themes: new ThemeManager(data, save) });
-    } catch (err) {
-      this.showError(err);
+    if (!this.gameData) {
+      this.showError(this.bootError);
       return;
     }
+    const data = this.gameData;
+    const save = new SaveStore(data.themes[0].id);
+    setServices({ data, save, economy: new Economy(data, save), themes: new ThemeManager(data, save) });
     this.loadFontsThen(() => this.scene.start('Menu'));
   }
 
@@ -41,7 +68,7 @@ export class BootScene extends Phaser.Scene {
         cb();
       }
     };
-    this.time.delayedCall(2600, go); // fallback so we never hang on font load
+    this.time.delayedCall(2600, go);
 
     const docFonts = (document as unknown as { fonts?: { load: (f: string) => Promise<unknown>; ready: Promise<unknown> } }).fonts;
     if (docFonts?.load) {

@@ -4,5 +4,6 @@
   "type": "rapidFire",
   "durationMs": 6000,
   "tint": "#ffd23f",
-  "dropChance": 0.12
+  "dropChance": 0.12,
+  "sprite": "powerupYellow_bolt"
 }

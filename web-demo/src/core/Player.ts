@@ -5,13 +5,12 @@ import type { Bullets } from './Bullets';
 import { glow } from './ui';
 import { hexToNum } from '../util/color';
 
-// Pointer-drag movement (thumb) + auto-fire — the mobile-standard control scheme.
+// Pointer-drag movement (thumb) + auto-fire. Uses the theme's Kenney ship sprite.
 export class Player extends Phaser.Physics.Arcade.Sprite {
   hp: number;
   maxHp: number;
   private stats: PlayerStats;
   private bullets: Bullets;
-  private bulletTint: number;
   private fireCd = 0;
   private rapidUntil = 0;
   private invulnUntil = 0;
@@ -22,7 +21,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, theme: ThemeDef, stats: PlayerStats, bullets: Bullets) {
     const W = scene.scale.width;
     const H = scene.scale.height;
-    super(scene, W / 2, H - 160, theme.player.shape === 'wasp' ? 'ship-wasp' : 'ship-arrow');
+    super(scene, W / 2, H - 170, theme.player.sprite);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -30,14 +29,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.bullets = bullets;
     this.maxHp = stats.maxHp;
     this.hp = stats.maxHp;
-    this.bulletTint = hexToNum(theme.player.bulletTint);
-    this.setTint(hexToNum(theme.player.tint));
-    glow(this, hexToNum(theme.player.tint), 4, 8);
+    this.setScale(64 / this.width);
+    glow(this, hexToNum(theme.player.tint), 5, 10);
     this.setDepth(10);
-    this.setDisplaySize(46, 50);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setSize(this.width * 0.5, this.height * 0.5, true);
+    body.setSize(this.width * 0.58, this.height * 0.58, true);
     this.setCollideWorldBounds(true);
 
     this.minY = H * 0.5;
@@ -86,10 +83,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private fire(time: number): void {
     const vy = -this.stats.bulletSpeed;
-    this.bullets.fire(this.x, this.y - 24, 0, vy, this.bulletTint, 1.1);
+    this.bullets.fire(this.x, this.y - 30, 0, vy, 0xffffff, 0.85);
     if (time < this.rapidUntil) {
-      this.bullets.fire(this.x - 13, this.y - 14, -60, vy, this.bulletTint, 0.9);
-      this.bullets.fire(this.x + 13, this.y - 14, 60, vy, this.bulletTint, 0.9);
+      this.bullets.fire(this.x - 18, this.y - 14, -70, vy, 0xffffff, 0.7);
+      this.bullets.fire(this.x + 18, this.y - 14, 70, vy, 0xffffff, 0.7);
     }
   }
 

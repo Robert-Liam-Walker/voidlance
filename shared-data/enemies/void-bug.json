@@ -1,13 +1,15 @@
 {
   "id": "void-bug",
-  "name": "Hive Stinger",
+  "name": "Stinger",
   "hp": 2,
   "shape": "bug",
-  "size": 38,
+  "size": 46,
   "scoreValue": 100,
   "coinValue": 2,
-  "tint": "#a6ff3a",
+  "tint": "#ff9a2a",
   "speed": 104,
+  "sprite": "enemyRed3",
+  "bulletSprite": "laserRed01",
   "fireChance": 0.17,
   "bulletSpeed": 250
 }

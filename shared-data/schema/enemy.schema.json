@@ -4,7 +4,7 @@
   "title": "Enemy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "hp", "shape", "size", "scoreValue", "coinValue", "tint", "speed"],
+  "required": ["id", "name", "hp", "shape", "size", "scoreValue", "coinValue", "tint", "speed", "sprite", "bulletSprite"],
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "name": { "type": "string", "minLength": 1 },
@@ -15,6 +15,8 @@
     "coinValue": { "type": "integer", "minimum": 0 },
     "tint": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
     "speed": { "type": "number", "minimum": 0 },
+    "sprite": { "type": "string", "minLength": 1 },
+    "bulletSprite": { "type": "string", "minLength": 1 },
     "fireChance": { "type": "number", "minimum": 0, "maximum": 1 },
     "bulletSpeed": { "type": "number", "minimum": 0 }
   }

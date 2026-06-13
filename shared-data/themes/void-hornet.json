@@ -16,7 +16,9 @@
     "fireRateMs": 240,
     "bulletSpeed": 600,
     "bulletDamage": 1,
-    "maxHp": 3
+    "maxHp": 3,
+    "sprite": "playerShip3_green",
+    "bulletSprite": "laserGreen01"
   },
   "background": { "style": "starfield", "starTint": "#a6ff3a" },
   "enemyRosterIds": ["void-bug"],
