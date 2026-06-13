@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { Entity } from '../world/types';
 import { WORLD_SCALE } from '../config';
+import { cloneShip } from './models';
 
 const SHIP_BASE_W = 5.2; // model wing span in world units
 
@@ -10,9 +11,9 @@ const SHIP_BASE_W = 5.2; // model wing span in world units
 export function createMesh(e: Entity): THREE.Object3D {
   switch (e.kind) {
     case 'player':
-      return ship(e.color, false, e.scale);
+      return ship(e.color, false, e.scale, 'player');
     case 'enemy':
-      return ship(e.color, true, e.scale);
+      return ship(e.color, true, e.scale, e.def?.behavior ?? 'fighter');
     case 'pbullet':
     case 'ebullet':
       return bullet(e.color, e.scale);
@@ -29,8 +30,18 @@ export function createMesh(e: Entity): THREE.Object3D {
   }
 }
 
-function ship(color: number, isEnemy: boolean, sizePx: number): THREE.Object3D {
+function ship(color: number, isEnemy: boolean, sizePx: number, role: string): THREE.Object3D {
   const holder = new THREE.Object3D();
+
+  // Kenney glTF model if loaded (normalized to unit length, facing -Z); else primitive.
+  const gltf = cloneShip(role);
+  if (gltf) {
+    if (isEnemy) gltf.rotation.y += Math.PI; // face +Z (toward player)
+    holder.add(gltf);
+    holder.scale.setScalar(sizePx * WORLD_SCALE);
+    return holder;
+  }
+
   const model = new THREE.Group();
   const body = new THREE.MeshStandardMaterial({ color, metalness: 0.45, roughness: 0.35, emissive: color, emissiveIntensity: 0.22 });
   const glowMat = new THREE.MeshBasicMaterial({ color: 0xfff2c0 });

@@ -25,7 +25,8 @@ async function page() {
 {
   const p = await page();
   await p.goto(BASE, { waitUntil: 'load' });
-  await sleep(900);
+  await p.waitForFunction(() => !!window.__VL, null, { timeout: 8000 });
+  await sleep(700);
   await p.screenshot({ path: `${shots}/3d-menu.png` });
   await p.close();
   console.log('menu captured');
