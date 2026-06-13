@@ -3,10 +3,12 @@ import { SaveStore } from './systems/Save';
 import { Economy } from './systems/Economy';
 import { setServices } from './services';
 import { Game } from './app/Game';
+import { preloadModels } from './render/models';
 
 // VOIDLANCE — Phase 0 web prototype, 3D (Three.js). Single theme: NOVA LANCE.
-// Validates canonical shared-data, then boots the sim/render game loop.
-function boot(): void {
+// Validates canonical shared-data, preloads the Kenney glTF ships, then boots
+// the sim/render game loop. Model-load failure falls back to primitives.
+async function boot(): Promise<void> {
   const mount = document.getElementById('game');
   if (!mount) return;
 
@@ -22,6 +24,12 @@ function boot(): void {
   const save = new SaveStore(theme.id);
   const economy = new Economy(data, save);
   setServices({ data, save, economy });
+
+  try {
+    await preloadModels();
+  } catch (err) {
+    console.warn('[models] glTF preload failed — using primitives', err);
+  }
 
   const game = new Game(mount, data, theme, economy);
   (window as unknown as { __VL?: Game }).__VL = game;
