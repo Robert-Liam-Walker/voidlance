@@ -7,7 +7,7 @@ export class Bullets {
   private W: number;
   private H: number;
 
-  constructor(scene: Phaser.Scene, private textureKey: string, maxSize = 256) {
+  constructor(scene: Phaser.Scene, private textureKey: string, maxSize = 256, private blend: Phaser.BlendModes = Phaser.BlendModes.NORMAL) {
     this.group = scene.physics.add.group({ defaultKey: textureKey, maxSize });
     this.W = scene.scale.width;
     this.H = scene.scale.height;
@@ -16,7 +16,7 @@ export class Bullets {
   fire(x: number, y: number, vx: number, vy: number, tint: number, scale = 1): Phaser.Physics.Arcade.Sprite | null {
     const b = this.group.get(x, y, this.textureKey) as Phaser.Physics.Arcade.Sprite | null;
     if (!b) return null;
-    b.setActive(true).setVisible(true).setTint(tint).setScale(scale);
+    b.setActive(true).setVisible(true).setTint(tint).setScale(scale).setBlendMode(this.blend);
     const body = b.body as Phaser.Physics.Arcade.Body;
     body.reset(x, y);
     body.enable = true;

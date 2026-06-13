@@ -81,6 +81,37 @@ export function buildTextures(scene: Phaser.Scene): void {
     for (let x = 0; x <= 128; x += 32) g.lineBetween(x, 0, x, 128);
     for (let y = 0; y <= 128; y += 32) g.lineBetween(0, y, 128, y);
   });
+  make('coin', 28, 28, () => {
+    g.lineStyle(3, C, 1);
+    g.strokeCircle(14, 14, 11);
+    g.fillStyle(C, 1);
+    g.fillCircle(14, 14, 4.5);
+  });
+
+  // Soft radial canvas textures: nebula clouds, glows, and a screen vignette.
+  const radial = (key: string, size: number, stops: [number, string][]): void => {
+    const tex = scene.textures.createCanvas(key, size, size);
+    if (!tex) return;
+    const ctx = tex.getContext();
+    const grd = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    for (const [o, col] of stops) grd.addColorStop(o, col);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, size, size);
+    tex.refresh();
+  };
+  radial('cloud', 256, [[0, 'rgba(255,255,255,1)'], [0.45, 'rgba(255,255,255,0.5)'], [1, 'rgba(255,255,255,0)']]);
+  radial('glow', 128, [[0, 'rgba(255,255,255,1)'], [0.5, 'rgba(255,255,255,0.45)'], [1, 'rgba(255,255,255,0)']]);
+
+  const vig = scene.textures.createCanvas('vignette', 720, 1280);
+  if (vig) {
+    const ctx = vig.getContext();
+    const grd = ctx.createRadialGradient(360, 600, 240, 360, 720, 840);
+    grd.addColorStop(0, 'rgba(0,0,0,0)');
+    grd.addColorStop(1, 'rgba(0,0,0,0.62)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, 720, 1280);
+    vig.refresh();
+  }
 
   g.destroy();
 }

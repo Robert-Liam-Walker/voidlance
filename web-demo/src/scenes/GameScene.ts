@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { services } from '../services';
-import { Starfield } from '../core/Starfield';
+import { Nebula } from '../core/Nebula';
 import { Bullets } from '../core/Bullets';
 import { Player } from '../core/Player';
 import { EnemyManager } from '../core/EnemyManager';
@@ -11,7 +11,7 @@ import type { ThemeDef, LevelDef } from '../data/types';
 
 export class GameScene extends Phaser.Scene {
   private theme!: ThemeDef;
-  private bg!: Starfield;
+  private bg!: Nebula;
   private playerBullets!: Bullets;
   private enemyBullets!: Bullets;
   private player!: Player;
@@ -44,9 +44,9 @@ export class GameScene extends Phaser.Scene {
     this.powerUps = undefined;
     this.levelIds = this.theme.levelIds.slice();
 
-    this.bg = new Starfield(this, this.theme);
-    this.playerBullets = new Bullets(this, 'bullet', 256);
-    this.enemyBullets = new Bullets(this, 'enemy-bullet', 256);
+    this.bg = new Nebula(this, this.theme);
+    this.playerBullets = new Bullets(this, 'bullet', 256, Phaser.BlendModes.ADD);
+    this.enemyBullets = new Bullets(this, 'enemy-bullet', 256, Phaser.BlendModes.ADD);
     this.player = new Player(this, this.theme, s.economy.stats(this.theme), this.playerBullets);
     this.enemies = new EnemyManager(this, s.data, this.theme, this.enemyBullets, () => this.player, () => this.onLevelCleared());
 
