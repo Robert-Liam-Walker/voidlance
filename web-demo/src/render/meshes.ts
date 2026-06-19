@@ -130,13 +130,13 @@ function attachEngineTrail(holder: THREE.Object3D, color: number): void {
     segs.push(m);
   }
 
-  // The engine glow doubles as the per-frame render hook: it is an actual
-  // renderable Mesh (an empty Object3D never triggers onBeforeRender), and it
-  // also gives the nozzle a soft additive bloom that pulses with the engine.
-  const glowGeo = new THREE.SphereGeometry(0.7, 10, 10);
-  const glowMat = new THREE.MeshBasicMaterial({ map: tex, color: hot, transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending });
-  const probe = new THREE.Mesh(glowGeo, glowMat);
-  probe.position.z = 2.2; // at the engine nozzle (+Z = aft)
+  // The engine glow doubles as the per-frame render hook (a renderable object is
+  // required — an empty Object3D never triggers onBeforeRender). A flat, camera-
+  // facing Sprite reads as a soft additive bloom at the nozzle rather than a 3D
+  // orb, and stays small relative to the ship.
+  const glowMat = new THREE.SpriteMaterial({ map: tex, color: hot, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
+  const probe = new THREE.Sprite(glowMat);
+  probe.position.z = 1.9; // at the engine nozzle (+Z = aft)
   probe.frustumCulled = false;
   holder.add(probe);
 
@@ -189,10 +189,11 @@ function attachEngineTrail(holder: THREE.Object3D, color: number): void {
 
     const drive = Math.min(1, speed / 36); // 0 idle .. 1 fast
 
-    // Engine bloom: brighter/bigger with throttle, plus a fast flicker.
+    // Engine bloom: brighter/bigger with throttle, plus a fast flicker. Kept
+    // small (a soft nozzle glow, not an orb) — scale is in the holder's space.
     const flick = 0.85 + Math.sin(now * 0.04) * 0.15;
-    glowMat.opacity = (0.45 + drive * 0.5) * flick;
-    const gs = 0.8 + drive * 0.9;
+    glowMat.opacity = (0.3 + drive * 0.4) * flick;
+    const gs = 0.32 + drive * 0.28;
     probe.scale.setScalar(gs * flick);
 
     for (let i = 0; i < segs.length; i++) {
