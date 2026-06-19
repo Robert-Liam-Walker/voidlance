@@ -4,6 +4,7 @@ import { Economy } from './systems/Economy';
 import { setServices } from './services';
 import { Game } from './app/Game';
 import { preloadModels } from './render/models';
+import { preloadTextures } from './render/textures';
 
 // VOIDLANCE — Phase 0 web prototype, 3D (Three.js). Single theme: NOVA LANCE.
 // Validates canonical shared-data, preloads the Kenney glTF ships, then boots
@@ -29,6 +30,12 @@ async function boot(): Promise<void> {
     await preloadModels();
   } catch (err) {
     console.warn('[models] glTF preload failed — using primitives', err);
+  }
+
+  try {
+    await preloadTextures();
+  } catch (err) {
+    console.warn('[textures] laser sprite preload failed — using capsules', err);
   }
 
   const game = new Game(mount, data, theme, economy);
