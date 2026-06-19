@@ -7,6 +7,8 @@ import { Renderer } from '../render/Renderer';
 import { Input } from './input';
 import { injectStyles, buildMenu, buildGameOver, Hud } from '../ui/ui';
 import type { MenuHandle } from '../ui/ui';
+import type { Audio } from '../audio';
+import { WorldAudio } from '../audio';
 
 type State = 'menu' | 'playing' | 'over';
 
@@ -18,6 +20,7 @@ export class Game {
   private screenHost: HTMLElement; // menus / game-over (interactive)
   private hudHost: HTMLElement; // in-game HUD (pass-through)
   world: World | null = null;
+  private worldAudio: WorldAudio | null = null;
   private hud: Hud | null = null;
   private menu: MenuHandle | null = null;
   private overlay: MenuHandle | null = null;
@@ -31,12 +34,30 @@ export class Game {
   private fpsAccum = 0;
   private fpsFrames = 0;
 
-  constructor(mount: HTMLElement, private data: GameData, private theme: ThemeDef, private economy: Economy) {
+  constructor(mount: HTMLElement, private data: GameData, private theme: ThemeDef, private economy: Economy, private audio: Audio) {
     injectStyles(theme);
     this.renderer = new Renderer(mount, theme);
     this.input = new Input(this.renderer.domElement);
     this.screenHost = layer(mount, true);
     this.hudHost = layer(mount, false);
+
+    // Menu / game-over UI is built inside src/ui (off-limits to edit), so hook
+    // its buttons via a delegated capture-phase listener instead. Any .vl-btn
+    // click = a UI blip; an affordable hangar upgrade (.small, not maxed/cant)
+    // = the purchase flourish (mirrors the buy path in ui.ts).
+    this.screenHost.addEventListener(
+      'click',
+      (e) => {
+        const btn = (e.target as HTMLElement | null)?.closest('.vl-btn');
+        if (!btn) return;
+        if (btn.classList.contains('small') && !btn.classList.contains('maxed') && !btn.classList.contains('cant')) {
+          this.audio.purchase();
+        } else {
+          this.audio.uiClick();
+        }
+      },
+      true
+    );
 
     const params = new URLSearchParams(location.search);
     const lvl = parseInt(params.get('lvl') ?? '', 10);
@@ -74,6 +95,7 @@ export class Game {
     this.renderer.reset();
     this.screenHost.style.pointerEvents = 'none';
     this.world = new World(this.theme, this.economy.stats(this.theme), this.data, this.economy, (r) => this.showGameOver(r), lvl);
+    this.worldAudio = new WorldAudio(this.audio, this.world);
     this.hud = new Hud(this.hudHost);
     this.state = 'playing';
   }
@@ -91,6 +113,7 @@ export class Game {
     this.hud?.destroy();
     this.hud = null;
     this.world = null;
+    this.worldAudio = null;
     this.renderer.reset();
   }
 
@@ -111,6 +134,7 @@ export class Game {
       if (k.x !== 0 || k.y !== 0) this.world.nudgeTarget(k.x, k.y);
 
       this.world.tick(dt, t);
+      this.worldAudio?.sample(this.world);
       this.renderer.syncWorld(this.world, dt);
       this.hud?.update({
         score: this.world.score,

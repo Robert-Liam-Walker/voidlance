@@ -8,6 +8,7 @@
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "name": { "type": "string", "minLength": 1 },
+    "coreAttack": { "enum": ["spread", "radialBurst", "spiral"], "description": "Core firing style. Omitted = 'spread' (player-aimed fan). 'radialBurst' = aimed fan with periodic full-circle volleys at low HP. 'spiral' = continuous rotating arms." },
     "coreHp": { "type": "integer", "minimum": 1 },
     "size": { "type": "number", "minimum": 8 },
     "entryY": { "type": "number", "minimum": 0 },
