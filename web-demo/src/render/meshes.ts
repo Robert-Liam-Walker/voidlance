@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Entity } from '../world/types';
 import { WORLD_SCALE } from '../config';
 import { cloneShip } from './models';
+import { laserTexture } from './textures';
 
 const SHIP_BASE_W = 5.2; // model wing span in world units
 
@@ -15,8 +16,9 @@ export function createMesh(e: Entity): THREE.Object3D {
     case 'enemy':
       return ship(e.color, true, e.scale, e.def?.behavior ?? 'fighter');
     case 'pbullet':
+      return bullet(e.color, e.scale, 'player');
     case 'ebullet':
-      return bullet(e.color, e.scale);
+      return bullet(e.color, e.scale, 'enemy');
     case 'powerup':
       return powerup(e.color, e.scale);
     case 'barrier':
@@ -68,8 +70,21 @@ function ship(color: number, isEnemy: boolean, sizePx: number, role: string): TH
   return holder;
 }
 
-function bullet(color: number, sizePx: number): THREE.Object3D {
+function bullet(color: number, sizePx: number, side: 'player' | 'enemy'): THREE.Object3D {
   const len = Math.max(0.8, sizePx * WORLD_SCALE);
+
+  // Kenney laser bolt sprite (billboard, always faces the tilted camera) if the
+  // texture is loaded; additive blending makes it glow. Falls back to a capsule.
+  const tex = laserTexture(side);
+  if (tex) {
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    if (side === 'enemy') mat.rotation = Math.PI; // bolt tip points down (toward player)
+    const sp = new THREE.Sprite(mat);
+    const h = len * 2.2; // streak length along travel
+    sp.scale.set(h * 0.34, h, 1); // bolt aspect ~ tall and thin
+    return sp;
+  }
+
   const m = new THREE.Mesh(new THREE.CapsuleGeometry(len * 0.18, len, 4, 8), new THREE.MeshBasicMaterial({ color }));
   m.rotation.x = Math.PI / 2; // long axis along Z (travel)
   return m;

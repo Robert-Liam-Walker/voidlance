@@ -7,7 +7,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // like the primitive fallback. If loading fails, callers fall back to primitives.
 
 // Tune if the Kenney nose points the wrong way after a screenshot check.
-const MODEL_YAW = Math.PI;
+// 0 = face -Z (up the screen): player aims at the enemies, enemies (+= PI) aim
+// back down at the player.
+const MODEL_YAW = 0;
 
 // role/behavior -> Space Kit file
 const FILES: Record<string, string> = {
