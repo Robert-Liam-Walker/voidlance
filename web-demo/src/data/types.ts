@@ -49,6 +49,7 @@ export interface BossPartDef {
 export interface BossDef {
   id: string;
   name: string;
+  coreAttack?: 'spread' | 'radialBurst' | 'spiral';
   coreHp: number;
   size: number;
   entryY: number;

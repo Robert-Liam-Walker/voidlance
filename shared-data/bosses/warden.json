@@ -1,7 +1,7 @@
 {
   "id": "warden",
   "name": "NOVA WARDEN",
-  "coreHp": 90,
+  "coreHp": 72,
   "size": 240,
   "entryY": 250,
   "swayAmp": 170,

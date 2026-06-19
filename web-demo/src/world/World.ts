@@ -64,6 +64,7 @@ export class World implements EnemyHost {
   private bossFireCd = 0;
   private bossRadialCd = 0;
   private bossSway = 0;
+  private bossSpiral = 0;
   private bossDone = false;
 
   constructor(
@@ -632,6 +633,7 @@ export class World implements EnemyHost {
     this.bossFireCd = def.fireRateMs;
     this.bossRadialCd = 4000;
     this.bossSway = 0;
+    this.bossSpiral = 0;
     this.levelName = def.name;
     const core = this.make('boss', W / 2, -180);
     core.hp = def.coreHp;
@@ -691,12 +693,16 @@ export class World implements EnemyHost {
     core.vy = 0;
     this.positionParts(dt);
 
+    const attack = def.coreAttack ?? 'spread';
     this.bossFireCd -= dtMs;
     if (this.bossFireCd <= 0) {
       this.bossFireCd = def.fireRateMs * fireMul;
-      this.bossSpread(core, def, phase);
+      if (attack === 'spiral') this.bossSpiralFire(core, def, phase);
+      else this.bossSpread(core, def, phase);
     }
-    if (phase >= 2) {
+    // Periodic full-circle volley: late-game for spread/spiral, earlier for radialBurst.
+    const radialFrom = attack === 'radialBurst' ? 1 : 2;
+    if (attack !== 'spiral' && phase >= radialFrom) {
       this.bossRadialCd -= dtMs;
       if (this.bossRadialCd <= 0) {
         this.bossRadialCd = 2600;
@@ -733,6 +739,18 @@ export class World implements EnemyHost {
     for (let i = 0; i < n; i++) {
       const ang = base + (i - (n - 1) / 2) * 0.16;
       this.enemyFire(core.x, core.y + 30, Math.cos(ang) * sp, Math.max(80, Math.sin(ang) * sp));
+    }
+  }
+
+  // Continuous rotating arms: the firing angle advances every shot, so bullets
+  // trace sweeping spiral arms. More arms open up as the boss loses HP.
+  private bossSpiralFire(core: Entity, def: BossDef, phase: number): void {
+    const sp = def.bulletSpeed;
+    const arms = 2 + phase; // 2 / 3 / 4 arms across phases
+    this.bossSpiral += 0.42;
+    for (let i = 0; i < arms; i++) {
+      const ang = this.bossSpiral + (i / arms) * Math.PI * 2;
+      this.enemyFire(core.x, core.y, Math.cos(ang) * sp, Math.sin(ang) * sp);
     }
   }
 

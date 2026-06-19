@@ -1,0 +1,20 @@
+{
+  "id": "leviathan",
+  "name": "NOVA LEVIATHAN",
+  "coreAttack": "spiral",
+  "coreHp": 80,
+  "size": 270,
+  "entryY": 240,
+  "swayAmp": 220,
+  "swayMs": 5200,
+  "bulletSpeed": 210,
+  "fireRateMs": 220,
+  "scoreValue": 3500,
+  "coinValue": 48,
+  "tint": "#9a6cff",
+  "parts": [
+    { "id": "turretL", "offsetX": -132, "offsetY": 28, "hp": 16, "size": 80, "fireRateMs": 1900, "pattern": "aimed", "tint": "#36e0ff" },
+    { "id": "turretR", "offsetX": 132, "offsetY": 28, "hp": 16, "size": 80, "fireRateMs": 1900, "pattern": "aimed", "tint": "#36e0ff" },
+    { "id": "spineTop", "offsetX": 0, "offsetY": -96, "hp": 22, "size": 72, "fireRateMs": 2400, "pattern": "spread", "tint": "#ff3df0" }
+  ]
+}

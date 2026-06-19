@@ -5,6 +5,7 @@ import { setServices } from './services';
 import { Game } from './app/Game';
 import { preloadModels } from './render/models';
 import { preloadTextures } from './render/textures';
+import { Audio, mountMuteButton } from './audio';
 
 // VOIDLANCE — Phase 0 web prototype, 3D (Three.js). Single theme: NOVA LANCE.
 // Validates canonical shared-data, preloads the Kenney glTF ships, then boots
@@ -38,7 +39,19 @@ async function boot(): Promise<void> {
     console.warn('[textures] laser sprite preload failed — using capsules', err);
   }
 
-  const game = new Game(mount, data, theme, economy);
+  // Procedural Web Audio system. Browsers start the context suspended until a
+  // user gesture, so resume on the first pointer/key event (capture-phase, once).
+  const audio = new Audio();
+  const wake = (): void => {
+    audio.resume();
+    audio.startMusic();
+  };
+  const opts: AddEventListenerOptions = { once: true, capture: true };
+  window.addEventListener('pointerdown', wake, opts);
+  window.addEventListener('keydown', wake, opts);
+  mountMuteButton(mount, audio);
+
+  const game = new Game(mount, data, theme, economy, audio);
   (window as unknown as { __VL?: Game }).__VL = game;
   game.start();
 }
