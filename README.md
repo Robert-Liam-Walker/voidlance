@@ -24,6 +24,5 @@ formations, earn coins, upgrade your ship.
 | `shared-data/` | Canonical game data (JSON + JSON Schema) — the single source of truth |
 | `web-demo/` | Phaser 3 + TypeScript prototype (Vite) |
 | `unity/` | Unity store build (Phase 1, not yet created) |
-| `CLAUDE.md` | Operating guide + rules + roadmap |
 
-See `CLAUDE.md` and the design spec for the phase plan and hard rules.
+See the design spec for the phase plan and hard rules.
